@@ -55,6 +55,15 @@ Regeln:
        Tool-Beschreibung). Ist Letzteres der Fall: Der Agent bereitet vor und übergibt den
        entstehenden Review-/Bestätigungs-Link an einen Menschen. Er ruft das Ausführungs-Tool
        NICHT selbst auf, auch nicht im Paper-Modus.
+       WICHTIG (durch echten Test bestätigt, siehe `tests/phase1-agent6/`, Nachtrag
+       2026-09-17): Diese Prüfung gilt PRO WERKZEUG UND PRO AKTIONSTYP, nicht pauschal für
+       eine ganze Plattform. Ein Tool zum Vorbereiten NEUER Orders (das einen brauchbaren
+       Review-Link liefert) sagt nichts darüber aus, ob ein Tool zum ÄNDERN bestehender
+       Positionen (z. B. nachträgliches TP/SL) ebenfalls einen Link liefert — auf Co-Invest
+       tut es das nicht. Liefert ein Vorbereitungs-Tool keinen verwertbaren Link/Zwischenzustand
+       (Kontrolle: Folgeaufruf des Portfolio-/Order-Status muss die Vorbereitung bestätigen),
+       gilt die Aktion als NICHT vorbereitbar durch diesen Agenten — an den Menschen mit der
+       echten, vom Portfolio-Tool gelieferten Konto-URL eskalieren, niemals einen Link erfinden.
 4. Bereite Orders bevorzugt einzeln mit Rückmeldung des Vorbereitungs-Status vor statt blind als
    Batch, solange das System nicht über einen längeren Zeitraum stabil validiert ist. Bei
    Batch-Vorbereitung: prüfe nach Abschluss JEDES Einzelergebnis, nicht nur den Gesamtstatus.
@@ -106,6 +115,12 @@ werden.
 
 - API-Schlüssel für Co-Invest niemals im Prompt oder Agenten-Kontext, sondern ausschließlich
   über sichere Secrets-Verwaltung der Orchestrierungsschicht.
+- Nachträgliches Setzen/Ändern von TP/SL auf einer bereits offenen Position (Co-Invest-Tool
+  `modify_position`) liefert in dieser Umgebung keinen für einen Text-Client nutzbaren
+  Bestätigungs-Link — anders als das Vorbereiten einer neuen Order (`suggest_order`). Für diesen
+  Aktionstyp bleibt aktuell nur der manuelle Weg über die echte Konto-URL aus `get_portfolio`
+  (`managementUrl`). Vor einer produktiven Nutzung prüfen, ob eine neuere Tool-Version oder ein
+  UI-fähiger Client das inzwischen unterstützt.
 - Einen technischen (nicht nur promptbasierten) Kill-Switch vorsehen: Der Orchestrator prüft
   vor jedem Aufruf dieses Agenten ein Tageslimit und blockiert den Tool-Zugriff hart, falls
   überschritten — unabhängig davon, was der Agent „will".
