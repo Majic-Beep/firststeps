@@ -1,0 +1,33 @@
+# Beispiel-Mandat fuer das AI-Hedgefonds-Konzept.
+#
+# Dies ist eine VORLAGE, keine Live-Konfiguration. Agent 4 (Risikomanager) und der
+# Orchestrator lesen diese Werte als Eingabeparameter - sie werden von keinem Agenten
+# selbst veraendert (siehe agents/04-risk-manager.md, Hinweise zur Implementierung).
+# Referenziert aus: agents/04-risk-manager.md, docs/02-architektur.md.
+
+capital:
+  base_currency: USD
+  initial_capital: 10000
+  # currently_available_pct wird laufend vom Orchestrator aktualisiert, nicht hier gepflegt.
+
+universe:
+  - BYBIT:BTCUSDT.P
+  - BYBIT:ETHUSDT.P
+  - BYBIT:SOLUSDT.P
+
+risk_limits:
+  # Harte Limits (Agent 4, Regel 3): Ueberschreitung = VETO, keine Interpretation.
+  max_position_pct_per_symbol: 0.20
+  max_position_pct_per_cluster: 0.30
+  correlation_cluster_threshold: 0.70   # ab dieser 30-Tage-Korrelation gelten zwei Symbole als ein Cluster
+  max_daily_loss_pct: 0.05              # globales Veto fuer ALLE neuen Positionen bei Ueberschreitung
+  max_leverage: 2.0
+
+validation_limits:
+  # Von Agent 3 verwendet, hier zentral gepflegt, damit Ergebnisse ueber die Zeit vergleichbar bleiben.
+  min_trades_for_statistical_significance: 30
+  require_out_of_sample_test: true
+
+rebalance:
+  cadence: daily
+  timezone: UTC
