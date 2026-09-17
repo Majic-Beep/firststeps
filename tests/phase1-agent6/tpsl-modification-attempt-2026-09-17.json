@@ -1,0 +1,15 @@
+{
+  "context": "Nachtraeglicher Versuch, fuer die reale, bereits offene ETH-Position (long, 0.408 @ 2451, siehe tests/phase1-agent7/) einen Stop-Loss zu setzen - der von Agent 7 gefundene Prozessfehler (fehlendes TP/SL bei Eroeffnung) sollte behoben werden.",
+  "tool_calls_made": [
+    {
+      "tool": "modify_position",
+      "params": {"asset": "ETH", "action": "add_tpsl", "positionSide": "long", "positionSize": 0.408, "stopLoss": 2435, "currentPrice": 2450.9, "liquidationPrice": 1225.5},
+      "result": {"status": "pending_confirmation", "note": "KEIN reviewUrl oder aequivalenter Link im Ergebnis - im Unterschied zu suggest_order."}
+    },
+    {"tool": "get_portfolio", "result": "sl: null fuer die ETH-Position - Aufruf hat serverseitig nichts hinterlegt."},
+    {"tool": "view_open_orders", "result": "Keine offenen Orders, keine TP/SL-Trigger - bestaetigt, dass nichts vorbereitet wurde."}
+  ],
+  "finding": "modify_position liefert, anders als suggest_order, keinen fuer einen Text-Client nutzbaren Bestaetigungs-Link. Fuer Aenderungen an bestehenden Positionen (im Unterschied zu neuen Orders) gibt es in dieser Umgebung keinen funktionierenden Vorbereitungs-Weg mit Handoff an einen Menschen.",
+  "resolution": "Stop-Loss wurde dem Nutzer stattdessen als manueller Schritt ueber das echte, von get_portfolio gelieferte managementUrl (https://app.liquid.trade) mitgeteilt - kein erfundener Link.",
+  "see_also": "tests/phase1-agent6/evaluation-2026-09-17.md, Abschnitt 'Nachtrag 2026-09-17'"
+}
