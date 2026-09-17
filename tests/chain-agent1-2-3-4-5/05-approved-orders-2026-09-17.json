@@ -1,0 +1,27 @@
+{
+  "input_source": "tests/chain-agent1-2-3-4/04-risk-verdict-2026-09-17.json - einziger Kandidat (ETH), von Agent 4 ohne Veto freigegeben, risk_level 'mittel'.",
+  "current_portfolio": {"positions": [], "available_capital_pct": 1.0},
+  "candidate": {
+    "symbol": "BYBIT:ETHUSDT.P",
+    "direction": "long",
+    "validator_verdict": "validated_with_caveats",
+    "confidence": 0.45,
+    "risk_verdict": {"veto": false, "max_position_pct": 0.10, "risk_level": "mittel"}
+  },
+  "output": {
+    "approved_orders": [
+      {
+        "symbol": "BYBIT:ETHUSDT.P",
+        "direction": "long",
+        "position_pct": 0.10,
+        "entry_condition": "Tagesschluss (close) > EMA(20) UND RSI(14) zwischen 45 und 65 (aus tests/chain-agent1-2-3/02-hypotheses)",
+        "take_profit": "kein fixes Kursziel - regelbasierter Ausstieg",
+        "stop_loss": "Tagesschluss < EMA(20) ODER RSI(14) > 75",
+        "rationale": "Einziger verbleibender Kandidat dieses Zyklus, von Agent 4 ohne Veto freigegeben. Volle risikofreigegebene Groesse (10%) genutzt, da keine Kapitalknappheit vorliegt (leeres Portfolio, 100% verfuegbar) und keine konkurrierenden Kandidaten priorisiert werden muessen. Trotz nur mittlerer Konfidenz (0.45) und 'validated_with_caveats' statt 'validated' wird die Position umgesetzt, weil Agent 4 bereits die entsprechend vorsichtigere Risikoeinstufung ('mittel') vorgenommen und die Positionsgroesse dementsprechend auf 10% begrenzt hat - eine zusaetzliche Reduktion durch Agent 5 waere eine doppelte, unbegruendete Vorsichtsmassnahme."
+      }
+    ],
+    "rejected_hypotheses": [],
+    "existing_position_actions": [],
+    "capital_summary": {"available_pct": 1.0, "newly_allocated_pct": 0.10, "note": "90% verbleiben bewusst als Cash - kein Zwang, verfuegbares Kapital vollstaendig zu investieren (Regel 7: 'kein Trade' oder eine kleine Position ist ein vollwertiges Ergebnis)."}
+  }
+}
