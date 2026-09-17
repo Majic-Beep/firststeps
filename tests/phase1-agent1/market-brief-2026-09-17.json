@@ -1,0 +1,171 @@
+{
+  "timestamp": "2026-09-17T15:30:00Z",
+  "universe": ["NASDAQ:AAPL", "NASDAQ:MSFT", "NASDAQ:NVDA", "NASDAQ:TSLA", "NASDAQ:AMZN"],
+  "macro": {
+    "regime": "unklar",
+    "regime_confidence": 0.35,
+    "regime_note": "Kein einheitliches Makro-Bild erkennbar: 2 von 5 Symbolen ueber alle Zeitebenen bullisch (AAPL, NVDA), 1 mostly_bullish (MSFT), 1 mixed (TSLA), 1 mostly_bearish (AMZN). Das Muster wirkt eher einzeltitelgetrieben als durch ein gemeinsames Makro-Regime erklaerbar. Ein wiederkehrendes Nachrichtenthema ('AI-Slowdown'-Narrativ, siehe AAPL- und NVDA-News) taucht in mehreren Symbolen auf und verdient Beobachtung, rechtfertigt aber noch keine Regime-Einstufung.",
+    "upcoming_events": [
+      {
+        "event": "Housing Starts (US)",
+        "datetime": "2026-09-17T12:30:00Z",
+        "relevance": "niedrig",
+        "note": "Bereits veroeffentlicht (actual 1.275 vs. forecast 1.31), rueckwaertsgewandt, geringe direkte Relevanz fuer das gewaehlte Tech-/Mega-Cap-Universum."
+      },
+      {
+        "event": "Building Permits Prel (US)",
+        "datetime": "2026-09-17T12:30:00Z",
+        "relevance": "niedrig",
+        "note": "Bereits veroeffentlicht (actual 1.394 vs. forecast 1.41), gleiche Einordnung wie Housing Starts."
+      },
+      {
+        "event": "President Trump and President Xi Summit",
+        "datetime": "2026-09-24T00:00:00Z",
+        "relevance": "hoch",
+        "note": "US-China-Gipfel mit potenziell direkter Relevanz fuer AAPL (China-Fertigung/-Absatz) und NVDA (Exportkontrollen fuer KI-Chips). Ergebnis nicht vorhersagbar; als Termin-Risiko, nicht als Richtungs-Aussage zu werten."
+      }
+    ]
+  },
+  "per_symbol": {
+    "NASDAQ:AAPL": {
+      "price_facts": {
+        "last": 332.28,
+        "change_pct_1d": -0.04,
+        "volume": 9686492,
+        "volume_vs_avg": null
+      },
+      "technical_summary": "Technisch ueber alle drei geprueften Zeitebenen (1D/4h/1W) bullisch (rating Buy/Buy/Strong Buy), RSI(1D) 61.98 – erhoeht, aber nicht ueberkauft. Kurs handelt rund 3.6% unter dem 52-Wochen-Hoch von 344.57.",
+      "technical_indicators": {"rsi_1d": 61.98, "macd_1d": 4.826, "macd_signal_1d": 3.439, "macd_signal": "bullish"},
+      "sentiment_score": -0.2,
+      "sentiment_confidence": 0.3,
+      "sentiment_method": "Qualitative Einordnung der 5 juengsten Schlagzeilen (kein dediziertes Sentiment-Scoring-Tool verfuegbar) - siehe data_quality_flags.",
+      "news_flags": [
+        "BofA: iPhone-Nachfrage soll trotz hoeherer Carrier-Incentives stabil bleiben (positiv)",
+        "WSJ: Samsung-Fans unbeeindruckt von Apples faltbarem Telefon (negativ)",
+        "Festliche Smartphone-Verkaeufe: staerkster Rueckgang seit einem Jahrzehnt wegen Speicherchip-Krise (negativ, branchenweit)"
+      ],
+      "contradictions": [
+        "Durchgehend bullische Technik steht im Spannungsverhaeltnis zu mehreren negativ gerahmten Konsum-/Absatz-Schlagzeilen (Foldable-Kritik, Branchen-weite Smartphone-Absatzschwaeche). Keine der beiden Seiten wird hier als 'richtig' bewertet, der Widerspruch wird bewusst offen gehalten."
+      ],
+      "data_quality_flags": ["prompt_injection_suspected: false"]
+    },
+    "NASDAQ:MSFT": {
+      "price_facts": {
+        "last": 495.79,
+        "change_pct_1d": 1.12,
+        "volume": 5096393,
+        "volume_vs_avg": null
+      },
+      "technical_summary": "mostly_bullish: 1D Buy, 4h Neutral, 1W Buy. RSI(1D) 54.63, MACD(1D) 7.48 unter Signal 10.77 (leicht abschwaechendes Momentum trotz Buy-Rating).",
+      "technical_indicators": {"rsi_1d": 54.63, "macd_1d": 7.479, "macd_signal_1d": 10.774, "macd_signal": "bearish_divergence_innerhalb_bullischem_rating"},
+      "sentiment_score": 0.3,
+      "sentiment_confidence": 0.3,
+      "sentiment_method": "Qualitative Einordnung der 5 juengsten Schlagzeilen - siehe data_quality_flags.",
+      "news_flags": [
+        "WSJ: Microsoft predigt eigene KI-Transformation (neutral/positiv)",
+        "Nokia-Microsoft-Deal staerkt optisches Netzwerk-Geschaeft (indirekt positiv)"
+      ],
+      "contradictions": [
+        "1D- und 1W-Rating bullisch, aber 4h-Rating neutral und MACD(1D) unter Signal-Linie - leichte Divergenz zwischen uebergeordnetem Trend und kurzfristigem Momentum."
+      ],
+      "data_quality_flags": ["prompt_injection_suspected: false"]
+    },
+    "NASDAQ:NVDA": {
+      "price_facts": {
+        "last": 218.95,
+        "change_pct_1d": 2.36,
+        "volume": 35028315,
+        "volume_vs_avg": null
+      },
+      "technical_summary": "fully_bullish ueber 1D/4h/1W (Buy/Buy/Buy), RSI(1D) 51.39 - neutral, kein Ueberhitzungssignal trotz starkem Tagesgewinn.",
+      "technical_indicators": {"rsi_1d": 51.39, "macd_1d": 0.46, "macd_signal_1d": 1.694, "macd_signal": "leicht_bearish_trotz_buy_rating"},
+      "sentiment_score": 0.0,
+      "sentiment_confidence": 0.25,
+      "sentiment_method": "Qualitative Einordnung der 5 juengsten Schlagzeilen - siehe data_quality_flags.",
+      "news_flags": [
+        "GuruFocus: 'Nvidia Just Got Another AI Chip Wake-Up Call' (negativ gerahmt)",
+        "Barron's: 'Why Nvidia Stock Looks Like a $5 Trillion Bargain' (positiv gerahmt)",
+        "Reuters: Frankreichs CEA/Alice & Bob suchen CUDA-Q-Alternative (potenziell negativ fuer NVDA-Software-Lock-in, langfristig)"
+      ],
+      "contradictions": [
+        "Zwei gegensaetzlich gerahmte Schlagzeilen am selben Tag ('Wake-Up Call' vs. '$5T Bargain') - Sentiment intern uneindeutig, deshalb sentiment_score = 0.0 statt einer erzwungenen Richtung.",
+        "Das AAPL-Nachrichtenset erwaehnt separat ein 'AI-Slowdown'-Narrativ - moeglicher branchenweiter Zusammenhang, hier nur als Beobachtung vermerkt, nicht quantifiziert."
+      ],
+      "data_quality_flags": ["prompt_injection_suspected: false"]
+    },
+    "NASDAQ:TSLA": {
+      "price_facts": {
+        "last": 365.08,
+        "change_pct_1d": 1.95,
+        "volume": 17716391,
+        "volume_vs_avg": null
+      },
+      "technical_summary": "mixed: 1D Buy, 4h Buy, 1W Sell. RSI(1D) 54.34 neutral. PE-Ratio 339.2 (aus Quote-Tool) - auffaellig hoch im Vergleich zu den anderen vier Symbolen (20-38x), wird hier als Fakt vermerkt, nicht bewertet.",
+      "technical_indicators": {"rsi_1d": 54.34, "macd_1d": 3.698, "macd_signal_1d": 3.575, "macd_signal": "leicht_bullish"},
+      "sentiment_score": 0.0,
+      "sentiment_confidence": 0.25,
+      "sentiment_method": "Qualitative Einordnung der 5 juengsten Schlagzeilen - siehe data_quality_flags.",
+      "news_flags": [
+        "Tesla erweitert Semi-Ladenetz um neue Truck-Hubs in Kalifornien (operativ positiv)",
+        "Barron's: 'Why Falling EV Deliveries Aren't a Problem for Tesla Stock' - Titel bestaetigt implizit sinkende Auslieferungen, rahmt sie aber als unproblematisch"
+      ],
+      "contradictions": [
+        "1D/4h-Rating bullisch, 1W-Rating bearish - direkter Widerspruch zwischen kurzfristigem und mittelfristigem Trend, explizit als 'mixed' und nicht geglaettet ausgewiesen.",
+        "Schlagzeile bestaetigt sinkende Fahrzeugauslieferungen (fundamentale Schwaeche), waehrend die Rahmung des Artikels dies als nicht kursrelevant darstellt - Fakt und Framing werden hier getrennt betrachtet."
+      ],
+      "data_quality_flags": ["prompt_injection_suspected: false", "valuation_outlier: PE 339x deutlich ueber Universums-Median"]
+    },
+    "NASDAQ:AMZN": {
+      "price_facts": {
+        "last": 251.55,
+        "change_pct_1d": 2.27,
+        "volume": 11149084,
+        "volume_vs_avg": null
+      },
+      "technical_summary": "mostly_bearish: 1D Sell, 4h Sell, 1W Neutral. RSI(1D) 45.77 - leicht unter Mittellinie, kein akutes Ueberverkauft-Signal.",
+      "technical_indicators": {"rsi_1d": 45.77, "macd_1d": -2.257, "macd_signal_1d": -1.014, "macd_signal": "bearish"},
+      "sentiment_score": -0.3,
+      "sentiment_confidence": 0.3,
+      "sentiment_method": "Qualitative Einordnung der 5 juengsten Schlagzeilen - siehe data_quality_flags.",
+      "news_flags": [
+        "Reuters: Senatoren fordern FTC-Untersuchung zu 'Made in USA'-Angaben von Amazon/Walmart (negativ, regulatorisch)",
+        "Reuters: Amazon/Walmart-Chatbots erregen Senats-Kritik wegen Label-Problemen (negativ, regulatorisch)",
+        "Benzinga: 'Amazon Stock Moves Higher: What's Going On?' (kurzfristig positiv)"
+      ],
+      "contradictions": [
+        "Tages-Kursbewegung laut Quote-Tool ist mit +2.27% deutlich positiv, waehrend das technische Composite-Rating (1D/4h) 'Sell' anzeigt - moeglicherweise Indikator-Nachlauf (Trend-Indikatoren reagieren verzoegert auf den heutigen Anstieg). Dieser Widerspruch wird explizit benannt statt aufgeloest.",
+        "Zwei regulatorische Negativ-Schlagzeilen (FTC/Senat) stehen einer kurzfristig positiven Kursreaktion gegenueber - moegliche Erklaerung waere, dass der Markt das regulatorische Risiko als gering einschaetzt, das ist hier aber eine Vermutung, keine belegte Aussage."
+      ],
+      "data_quality_flags": ["prompt_injection_suspected: false"]
+    }
+  },
+  "cross_symbol": {
+    "correlation_matrix_30d_1D_returns": {
+      "period": "2026-08-06 bis 2026-09-17, 30 taegliche Log-Returns",
+      "notable_pairs": [
+        {"pair": ["NASDAQ:MSFT", "NASDAQ:AMZN"], "correlation": 0.482, "staerke": "moderat positiv"},
+        {"pair": ["NASDAQ:AAPL", "NASDAQ:MSFT"], "correlation": 0.354, "staerke": "schwach positiv"},
+        {"pair": ["NASDAQ:NVDA", "NASDAQ:TSLA"], "correlation": 0.311, "staerke": "schwach positiv"}
+      ],
+      "interpretation": "Tool-Interpretation: 'gut diversifiziert, niedrige Korrelationen' - alle Paarkorrelationen liegen unter 0.5, kein dominantes Cluster erkennbar."
+    }
+  },
+  "data_quality_flags_global": [
+    "Keine Durchschnittsvolumen-Baseline aus den verfuegbaren Tools ableitbar -> 'volume_vs_avg' bewusst auf null gesetzt statt geschaetzt.",
+    "Kein dediziertes Sentiment-Scoring-Tool im verfuegbaren Werkzeugsatz -> alle sentiment_score-Werte sind grobe, manuelle Einordnungen von je 5 Schlagzeilen mit entsprechend niedriger confidence (0.25-0.3), keine kalibrierte Kennzahl.",
+    "get_economic_calendar mit importance=['high'] angefragt, Antwort enthaelt aber ein numerisches 'importance': 1 - unklar, ob dies tatsaechlich 'hoch' bedeutet oder eine andere Skala ist. Relevanz-Einstufung der Kalenderereignisse oben daher manuell anhand des Ereignis-Inhalts vorgenommen, nicht anhand des Tool-Felds.",
+    "Geringfuegige Preisabweichung zwischen zwei nahezu zeitgleichen Tool-Aufrufen fuer AAPL (get_quotes_batch: 332.28 vs. analyze_multi_timeframe_batch: 332.31) - plausibel durch reale Kursbewegung zwischen den Aufrufen, kein Anzeichen fehlerhafter Daten."
+  ],
+  "limitations": [
+    "Einmalige Punkt-in-Zeit-Momentaufnahme, keine Intraday-Historie ausgewertet.",
+    "Sentiment basiert auf je 5 Schlagzeilen pro Symbol - kleine Stichprobe, nicht repraesentativ fuer das volle Nachrichtenaufkommen des Tages.",
+    "Keine Fundamentaldaten (Gewinne, Umsatzwachstum) ueber die im Quote enthaltenen Kennzahlen (PE) hinaus abgefragt - Bewertungsurteile jenseits von PE sind aus diesem Brief nicht ableitbar."
+  ],
+  "sources": [
+    "tradingview:get_quotes_batch",
+    "tradingview:analyze_multi_timeframe_batch",
+    "tradingview:get_economic_calendar",
+    "tradingview:calculate_correlation_tool",
+    "tradingview:get_news (je Symbol, limit=5)"
+  ]
+}
