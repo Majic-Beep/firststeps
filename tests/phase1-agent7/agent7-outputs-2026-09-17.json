@@ -1,0 +1,89 @@
+{
+  "scenario_A_real_cycle": {
+    "description": "Der erste echte Zyklus dieser Testreihe (BTC/ETH/SOL -> ETH ueberlebt -> real vom Nutzer bestaetigter Trade). Agent 7 analysiert die tatsaechliche Ausfuehrung.",
+    "input_source": "tests/chain-agent1-2-3-4-5-6/ + realer, vom Nutzer bestaetigter Trade auf Co-Invest am 2026-09-17 (ETH-PERP long 0.408 @ 2451).",
+    "output": {
+      "cycle_id": "2026-09-17-eth-cycle",
+      "outcome_summary": {
+        "expected": "Order vorbereitet bei Mark-Preis 2470.59, mit TP/SL zum Schutz der Position ab Eroeffnung.",
+        "actual": "Order ausgefuehrt bei 2451 (-0.79% Slippage/Kursbewegung waehrend der menschlichen Bestaetigung), OHNE TP/SL. Kernthese (regelbasierter Ausstieg via EMA20/RSI) noch nicht beurteilbar, da Position noch offen.",
+        "deviation_pct": null
+      },
+      "root_cause": {
+        "stage": "agent6",
+        "type": "prozessfehler",
+        "explanation": "Regel 3 von agents/06-execution-trader.md verlangt ausdruecklich, dass fuer JEDE vorzubereitende Position Take-Profit UND Stop-Loss mit vorgeschlagen werden. Beim tatsaechlichen suggest_order-Aufruf wurden diese Parameter nicht gesetzt - eine klare, eindeutige Regelverletzung, keine mehrdeutige Ergebnis-Varianz. Das Co-Invest-Tool selbst haette stopLoss/takeProfit-Parameter akzeptiert; es handelt sich nicht um eine Plattform-Einschraenkung wie beim Ausfuehrungs-Befund aus tests/phase1-agent6/, sondern um eine schlicht nicht befolgte eigene Regel."
+      },
+      "recurring_pattern": {"is_recurring": false, "prior_occurrences": []},
+      "confidence_calibration_note": "Nur 1 Zyklus vorhanden - eine Aussage ueber Kalibrierung (trafen hohe Konfidenzwerte haeufiger zu als niedrige?) ist erst ab mehreren abgeschlossenen Zyklen moeglich. Kein Befund, nur eine Einschraenkung.",
+      "proposed_changes": [
+        {
+          "target": "orchestrator/schemas.py (EXECUTION_ITEM_SCHEMA) + orchestrator/killswitch.py (check_tp_sl_proposed)",
+          "change": "Pflichtfeld 'tp_sl_proposed' in der Ausfuehrungs-Ausgabe UND ein Kill-Switch, der die Pipeline stoppt, wenn eine Position ohne vorgeschlagenes TP/SL eroeffnet wird.",
+          "justification": "Regel 3 existierte bereits, wurde aber schlicht nicht befolgt. Das ist ein Fall, in dem sich - genau wie bei den Risikolimits - deterministischer Code und Agenten-Disziplin gegenseitig absichern sollten, statt sich auf eine erneute Befolgung der Regel zu verlassen.",
+          "requires_review_before_activation": true
+        }
+      ],
+      "watch_items": [
+        "Slippage von -0.79% zwischen Order-Vorbereitung (Mark-Preis) und menschlicher Bestaetigung beobachten - bei einem einzelnen Datenpunkt noch kein Alarmsignal, aber Teil der Zeit-bis-Bestaetigung-Problematik, die je nach Plattform variieren kann.",
+        "Kernthese (Ausstieg bei Tagesschluss < EMA20 ODER RSI > 75) ist noch nicht beurteilbar, da die Position noch offen ist. Erneut pruefen, sobald sie geschlossen wird - erst dann ist eine echte Erwartung-vs-Ergebnis-Aussage zur STRATEGIE (nicht nur zur Ausfuehrung) moeglich."
+      ]
+    }
+  },
+  "scenario_B_single_loss_no_overreaction": {
+    "description": "SYNTHETISCH (keine echten Daten). Prueft Regel 2/3: Ein einzelner Verlust bei korrekt befolgtem Prozess darf NICHT zu einer Regeländerung fuehren.",
+    "input": {
+      "hypothesis": {"symbol": "SYNTH:BTC", "confidence": 0.55, "entry_condition": "close > EMA20 AND RSI 45-65"},
+      "validation_verdict": "validated_with_caveats",
+      "risk_verdict": {"veto": false},
+      "approved_position_pct": 0.05,
+      "execution": {"status": "executed", "tp_sl_proposed": true, "tp_sl_set": true, "actual_fill_price": 50000},
+      "outcome": "Nach 4 Tagen regelbasiert am Stop-Loss ausgestiegen, -2.1%. Alle Regeln von allen Agenten korrekt befolgt."
+    },
+    "output": {
+      "cycle_id": "synthetic-scenario-B",
+      "outcome_summary": {"expected": "Trendfortsetzung", "actual": "-2.1% nach 4 Tagen, regelkonformer Stop-Out", "deviation_pct": -2.1},
+      "root_cause": {
+        "stage": "kein_fehler_normale_varianz",
+        "type": "ergebnisfehler_bei_korrektem_prozess",
+        "explanation": "Alle Agenten haben ihre eigenen Regeln korrekt befolgt (TP/SL gesetzt, Risiko geprueft, Ausstieg regelkonform ausgeloest). Ein Verlust bei korrektem Prozess ist normale Marktunsicherheit, kein Fehler, der behoben werden muss."
+      },
+      "recurring_pattern": {"is_recurring": false, "prior_occurrences": []},
+      "proposed_changes": [],
+      "watch_items": [
+        "Erster Verlust-Trade mit diesem EMA20/RSI-Setup - im Auge behalten, ob sich das Muster in kommenden Zyklen wiederholt. Noch KEIN Regeländerungsbedarf nach nur einem Vorkommen (Regel 3)."
+      ]
+    }
+  },
+  "scenario_C_third_recurrence_triggers_change": {
+    "description": "SYNTHETISCH (keine echten Daten). Gleiches Setup wie Szenario B, aber es ist bereits der DRITTE aufeinanderfolgende Verlust mit identischer Regel - prueft, ob Agent 7 jetzt korrekt eskaliert.",
+    "input": {
+      "hypothesis": {"symbol": "SYNTH:ETH", "confidence": 0.50, "entry_condition": "close > EMA20 AND RSI 45-65"},
+      "execution": {"status": "executed", "tp_sl_proposed": true, "tp_sl_set": true},
+      "outcome": "Erneut regelbasiert am Stop-Loss ausgestiegen, -1.8%.",
+      "prior_occurrences": ["synthetic-scenario-B (-2.1%, identische Regel)", "synthetic-scenario-B2 (-1.5%, identische Regel, gleicher Symbol-Cluster)"]
+    },
+    "output": {
+      "cycle_id": "synthetic-scenario-C",
+      "outcome_summary": {"expected": "Trendfortsetzung", "actual": "-1.8%, dritter Stop-Out in Folge mit identischer Regel", "deviation_pct": -1.8},
+      "root_cause": {
+        "stage": "kein_fehler_normale_varianz",
+        "type": "ergebnisfehler_bei_korrektem_prozess",
+        "explanation": "Prozess weiterhin korrekt befolgt - aber DREI aufeinanderfolgende Verluste mit exakt derselben Einstiegsregel (EMA20 + RSI 45-65) auf korrelierten Symbolen sind kein Zufall mehr wert, sondern ein wiederkehrendes Muster, das echte strukturelle Schwaeche der Regel oder einen Regimewechsel nahelegt."
+      },
+      "recurring_pattern": {
+        "is_recurring": true,
+        "prior_occurrences": ["synthetic-scenario-B (-2.1%)", "synthetic-scenario-B2 (-1.5%)"]
+      },
+      "proposed_changes": [
+        {
+          "target": "agents/02-strategy-researcher.md (Bull/Bear-Debatte) + agents/03-validator-backtester.md (Parameter-Sensitivitaet)",
+          "change": "EMA20+RSI(45-65)-Einstiegsregel vor erneuter Verwendung einer Parameter-Sensitivitaetsanalyse unterziehen und pruefen, ob sich das zugrunde liegende Marktregime seit der urspruenglichen Validierung veraendert hat.",
+          "justification": "Drei aufeinanderfolgende Verluste mit identischer Regel auf korrelierten Symbolen erfuellen die in Regel 3 des Lern-Agenten-Prompts genannte Schwelle fuer ein wiederkehrendes Muster - anders als bei einem Einzelfall (Szenario B) ist eine Regelpruefung jetzt gerechtfertigt.",
+          "requires_review_before_activation": true
+        }
+      ],
+      "watch_items": []
+    }
+  }
+}

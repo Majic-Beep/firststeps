@@ -30,6 +30,7 @@ STAGES = [
     "agent4_risk_manager",
     "agent5_portfolio_manager",
     "agent6_execution_trader",
+    "agent7_learning",  # conditional — only runs once every order is "executed"
 ]
 
 
@@ -132,6 +133,10 @@ def run_pipeline(
         output = _run_stage(runner, audit, stage, input_data)
         outputs[stage] = output
 
+        # --- Kill-switch: no position opens without a proposed TP/SL -----
+        stage = "killswitch:tp_sl_proposed"
+        killswitch.check_tp_sl_proposed(outputs["agent6_execution_trader"])
+
         # --- Agent 7 gate: only proceed once orders are actually filled --
         pending = [
             e for e in output["executions"] if e["status"] != "executed"
@@ -145,6 +150,19 @@ def run_pipeline(
             )
             audit.record_stopped("agent7_learning", reason)
             raise PipelineHalted(reason)
+
+        # --- Agent 7: Lern-Agent -------------------------------------------
+        stage = "agent7_learning"
+        input_data = {
+            "hypothesis": outputs["agent2_strategist"],
+            "validation": outputs["agent3_validator"],
+            "risk_verdict": outputs["agent4_risk_manager"],
+            "approved_orders": outputs["agent5_portfolio_manager"],
+            "execution_report": outputs["agent6_execution_trader"],
+            "prior_cycles": [],
+        }
+        output = _run_stage(runner, audit, stage, input_data)
+        outputs[stage] = output
 
     except (killswitch.KillSwitchTriggered, PipelineHalted) as exc:
         audit.finalize()

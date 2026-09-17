@@ -7,17 +7,23 @@ Abschnitts „Orchestrierung" in [`docs/02-architektur.md`](02-architektur.md).
 
 ## Was er tut
 
-1. Ruft Agent 1–6 in fester Reihenfolge auf (kein Agent entscheidet, was als Nächstes läuft).
+1. Ruft Agent 1–7 in fester Reihenfolge auf (kein Agent entscheidet, was als Nächstes läuft) —
+   Agent 7 nur, wenn Agent 6 jede Order tatsächlich als ausgeführt UND mit vorgeschlagenem TP/SL
+   meldet (siehe Punkt 5).
 2. Validiert jede Ausgabe gegen ein festes Schema (`orchestrator/schemas.py`) — bei Abweichung
    bricht der Lauf hart ab, statt mit unvollständigen Daten weiterzumachen.
 3. Prüft harte Risikolimits **im Code, nicht per Agenten-Urteil** (`orchestrator/killswitch.py`):
-   Tagesverlustlimit vor Agent 4, globales Veto vor Agent 5, und eine Nachprüfung, dass Agent 5
-   niemals die von Agent 4 gesetzte Positionsgrößen-Obergrenze überschreitet — genau das
-   "defense in depth"-Prinzip, das `agents/04-risk-manager.md` explizit fordert.
+   Tagesverlustlimit vor Agent 4, globales Veto vor Agent 5, eine Nachprüfung, dass Agent 5
+   niemals die von Agent 4 gesetzte Positionsgrößen-Obergrenze überschreitet, und (seit dem
+   ersten echten Agent-7-Fund, siehe `tests/phase1-agent7/`) dass keine Position ohne
+   vorgeschlagenes Take-Profit/Stop-Loss eröffnet wird — genau das "defense in depth"-Prinzip,
+   das `agents/04-risk-manager.md` explizit fordert.
 4. Persistiert Ein-/Ausgabe jeder Stufe vollständig (`orchestrator/audit.py`, Ordner `runs/`).
 5. Stoppt **immer** vor Agent 7, wenn Agent 6 nicht meldet, dass eine Order tatsächlich
-   ausgeführt wurde — auf Co-Invest ist das laut `tests/phase1-agent6/` sogar der Normalfall,
-   nicht der Ausnahmefall, siehe unten.
+   ausgeführt wurde, oder wenn TP/SL nicht vorgeschlagen wurde — auf Co-Invest ist ohne
+   menschliche Bestätigung ohnehin nie eine Ausführung möglich (siehe `tests/phase1-agent6/`),
+   und der reale 2026-09-17-Zyklus zeigt, dass selbst nach Bestätigung noch eine echte
+   Regelverletzung übersehen werden kann, siehe `tests/phase1-agent7/`.
 
 ## Was er bewusst NICHT tut
 
@@ -36,14 +42,19 @@ austauschbare Schnittstelle (`AgentRunner`) mit zwei Implementierungen:
   echte Tool-Anbindung pro Datenquelle, die menschliche Bestätigung bei Co-Invest). Das ist bewusst
   kein halbfertiger Vortäusch-Code, der beim ersten echten Aufruf überraschend fehlschlägt.
 
-## Warum jeder Lauf vor Agent 6 stehen bleibt (Stand heute)
+## Warum der mitgelieferte Zyklus trotzdem nie Agent 7 automatisch erreicht
 
-`tests/phase1-agent6/evaluation-2026-09-17.md` hat gezeigt: Co-Invest lässt keine autonome
-Ausführung durch einen Agenten zu, auch nicht im Paper-Modus — `execute_order`/`execute_tpsl`
-lösen ausschließlich über eine menschliche Bestätigungs-Oberfläche aus. Der mitgelieferte
-Fixture-Zyklus bildet genau das ab: Der Lauf endet nach Agent 6 mit Status
-`prepared_awaiting_human_confirmation` und einem Review-Link, nicht mit einer erfundenen
-Ausführung. Agent 7 wird für diesen Zyklus konsequent übersprungen.
+Der ETH-Trade aus dem mitgelieferten Fixture-Zyklus wurde inzwischen real vom Nutzer über den
+Co-Invest-Review-Link bestätigt (siehe `tests/chain-agent1-2-3-4-5-6/`). Trotzdem hält der
+Orchestrator-Replay dieses Zyklus **nicht** bei Agent 7 an: Agent 7s eigene Analyse
+(`tests/phase1-agent7/`) deckte auf, dass die Order entgegen Regel 3 in
+`agents/06-execution-trader.md` ohne Take-Profit/Stop-Loss vorbereitet wurde. Der daraufhin
+ergänzte Kill-Switch `check_tp_sl_proposed` stoppt den Lauf jetzt genau dort — nach Agent 6, vor
+Agent 7 —, und zeigt damit, dass er den realen Fehler, der sich damals unbemerkt bis zur
+menschlichen Bestätigung durchgeschlichen hat, beim nächsten Mal vorher abfangen würde. Ein
+zusätzlicher, klar als synthetisch gekennzeichneter Test
+(`test_full_cycle_reaches_agent7_when_tp_sl_proposed`) bestätigt, dass die Agent-7-Stufe selbst
+funktioniert, sobald diese Bedingung erfüllt ist.
 
 ## Ausführen
 
@@ -61,10 +72,13 @@ ausgeschlossen — das sind Laufzeit-Artefakte, kein Quellcode).
 - Nur ein einziger, real aufgezeichneter Zyklus ist als Fixture hinterlegt. Für weitere Zyklen
   müssten neue Fixtures nach demselben Muster erstellt werden (oder `ClaudeAgentRunner`
   fertig implementiert werden).
-- Die Kill-Switches decken die drei in `agents/04` und `agents/05` explizit genannten Fälle ab
-  (Tagesverlust, globales Veto, Positionsgrößen-Obergrenze). Weitere Limits aus
+- Die Kill-Switches decken die vier bisher konkret gefundenen/geforderten Fälle ab
+  (Tagesverlust, globales Veto, Positionsgrößen-Obergrenze, fehlendes TP/SL). Weitere Limits aus
   `config/mandate.example.yaml` (Cluster-Limit, Hebel) sind im Mandat definiert, aber noch nicht
   als eigener Kill-Switch verdrahtet — das ist die naheliegende nächste Erweiterung.
+- Für den realen 2026-09-17-Zyklus existiert kein `agent7_learning.json`-Fixture, weil dieser
+  Zyklus (korrekterweise) nie bis dorthin gekommen ist — Agent 7s Ausgabe für diesen Zyklus liegt
+  nur als eigenständige Analyse in `tests/phase1-agent7/` vor, nicht als Orchestrator-Fixture.
 - Es gibt noch keinen Scheduler (täglich/stündlich). `run_pipeline()` läuft genau einmal pro
   Aufruf; Wiederholung ist Sache des Aufrufers (Cron, GitHub Actions, o. Ä.), nicht Teil dieses
   Pakets.

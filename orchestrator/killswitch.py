@@ -58,6 +58,27 @@ def check_position_size_ceiling(approved_orders: dict, risk_verdict: dict) -> No
             )
 
 
+def check_tp_sl_proposed(execution_report: dict) -> None:
+    """Every position-opening execution must have proposed TP/SL.
+
+    Added directly as a result of Agent 7's first real post-mortem
+    (tests/phase1-agent7/): the 2026-09-17 ETH cycle was prepared and
+    confirmed WITHOUT take-profit/stop-loss, in violation of
+    agents/06-execution-trader.md, Regel 3. That was a clear-cut rule
+    violation, not ambiguous outcome variance, so it is enforced here in
+    code rather than left to an agent remembering the rule next time.
+    """
+    opens = {"prepared_awaiting_human_confirmation", "executed"}
+    for execution in execution_report.get("executions", []):
+        if execution["status"] in opens and not execution.get("tp_sl_proposed"):
+            raise KillSwitchTriggered(
+                f"{execution['symbol']}: Position wird eröffnet/vorbereitet ohne "
+                f"vorgeschlagenes Take-Profit/Stop-Loss. Das verletzt "
+                f"agents/06-execution-trader.md, Regel 3 — Pipeline gestoppt, "
+                f"bevor ein Mensch überhaupt zur Bestätigung aufgefordert wird."
+            )
+
+
 def check_leverage(order_leverage: float, mandate: Mandate) -> None:
     if order_leverage > mandate.max_leverage:
         raise KillSwitchTriggered(
