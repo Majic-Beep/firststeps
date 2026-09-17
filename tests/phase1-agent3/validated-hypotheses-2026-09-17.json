@@ -1,0 +1,82 @@
+{
+  "results": [
+    {
+      "symbol": "BYBIT:BTCUSDT.P",
+      "timeframe": "1h",
+      "hypothesis_ref": "A - EMA20/50 Trend Following (long-only, kein Short)",
+      "backtest_period": {
+        "in_sample": {"start": "2023-01-01", "end": "2025-01-01"},
+        "out_of_sample": {"start": "2025-01-01", "end": "2026-09-01"},
+        "regimes_covered": ["2023 Erholung nach Bear-Markt", "2024 Bullenmarkt bis neues ATH", "2025-2026 Konsolidierung/Korrektur"]
+      },
+      "in_sample": {"return_pct": 167.74, "sharpe": 1.56, "max_drawdown_pct": 33.37, "win_rate_pct": 30.36, "num_trades": 168, "profit_factor": 1.55},
+      "out_of_sample": {"return_pct": -28.77, "sharpe": -0.54, "max_drawdown_pct": 47.27, "win_rate_pct": 27.46, "num_trades": 142, "profit_factor": 0.76},
+      "costs_included": true,
+      "commission_model": "0.05% pro Order (Engine-Parity-Profil, TradingView-aequivalent)",
+      "overfitting_flags": [
+        "Grosse Kluft zwischen In-Sample (+167.7%, Sharpe 1.56) und Out-of-Sample (-28.8%, Sharpe -0.54) - klassisches Overfitting-/Regimewechsel-Warnsignal.",
+        "Max Drawdown verschlechtert sich Out-of-Sample deutlich (33.4% -> 47.3%).",
+        "Profit Factor faellt von 1.55 (profitabel) auf 0.76 (Verlustzone)."
+      ],
+      "backtest_links": {
+        "in_sample": "https://mcp-api.trader.dev/backtest/01M2R0DB37WTK9JXYXRHJCBCQM",
+        "out_of_sample": "https://mcp-api.trader.dev/backtest/01M2R0E2B62WZGFYQS28T7ED2W"
+      },
+      "verdict": "rejected",
+      "rationale": "Die Strategie ist im In-Sample-Fenster stark profitabel, kippt aber im Out-of-Sample-Fenster vollstaendig in den Verlust - bei gleichzeitig hoeherem Drawdown. Das ist genau das Muster, vor dem Regel 3/4 des Validator-Prompts warnt (grosse Luecke zwischen In-Sample und Out-of-Sample). Die In-Sample-Performance war primaer ein Artefakt des starken BTC-Bullenmarkts 2023-2024, nicht ein robuster Edge der EMA-Crossover-Logik selbst. Kein 'validated' oder 'validated_with_caveats' vertretbar."
+    },
+    {
+      "symbol": "BYBIT:BTCUSDT.P",
+      "timeframe": "1h",
+      "hypothesis_ref": "B - RSI14 Mean Reversion 30/55 (long-only, kein Short)",
+      "backtest_period": {
+        "in_sample": {"start": "2023-01-01", "end": "2025-01-01"},
+        "out_of_sample": {"start": "2025-01-01", "end": "2026-09-01"},
+        "regimes_covered": ["2023 Erholung nach Bear-Markt", "2024 Bullenmarkt bis neues ATH", "2025-2026 Konsolidierung/Korrektur"]
+      },
+      "in_sample": {"return_pct": -0.12, "sharpe": 0.12, "max_drawdown_pct": 23.14, "win_rate_pct": 64.71, "num_trades": 102, "profit_factor": 1.00},
+      "out_of_sample": {"return_pct": -1.66, "sharpe": 0.08, "max_drawdown_pct": 33.72, "win_rate_pct": 64.08, "num_trades": 103, "profit_factor": 0.98},
+      "costs_included": true,
+      "commission_model": "0.05% pro Order (Engine-Parity-Profil, TradingView-aequivalent)",
+      "overfitting_flags": [],
+      "backtest_links": {
+        "in_sample": "https://mcp-api.trader.dev/backtest/01M2R0DCXK0TRAD2D97KD8NFXJ",
+        "out_of_sample": "https://mcp-api.trader.dev/backtest/01M2R0E49YT6B2HF325Q2TAR8J"
+      },
+      "verdict": "rejected",
+      "rationale": "Kein Overfitting im engeren Sinne - Performance ist in beiden Fenstern konsistent nahe Nulllinie/leicht negativ, es gibt also keine grosse In-Sample/Out-of-Sample-Kluft. Die Strategie ist aber schlicht nicht profitabel: Trotz hoher Trefferquote (~64-65%) ist das Verhaeltnis Durchschnittsgewinn/-verlust ungünstig (ratioAvgWinLoss ~0.55, d.h. Verlust-Trades sind im Schnitt fast doppelt so gross wie Gewinn-Trades), sodass die Kosten (Commission) den kleinen strukturellen Nachteil in beiden Fenstern ins Minus drehen. Verdikt 'rejected' - nicht wegen Overfitting, sondern weil die Strategie konsistent keinen Edge zeigt."
+    },
+    {
+      "symbol": "BYBIT:BTCUSDT.P",
+      "timeframe": "1h",
+      "hypothesis_ref": "C - RSI-Extrem-ueberverkauft (<15) + SMA200-Trendfilter (absichtlicher Overfitting-Testfall)",
+      "backtest_period": {
+        "in_sample": {"start": "2026-08-01", "end": "2026-09-17"},
+        "out_of_sample": null,
+        "regimes_covered": ["nur ein einzelnes, sehr kurzes (~6,5 Wochen) Fenster - kein Regimewechsel abgedeckt"]
+      },
+      "in_sample": {"return_pct": 0, "sharpe": null, "max_drawdown_pct": 0, "win_rate_pct": 0, "num_trades": 0, "profit_factor": 0},
+      "out_of_sample": null,
+      "costs_included": true,
+      "commission_model": "0.05% pro Order (Engine-Parity-Profil, TradingView-aequivalent) - im Ergebnis irrelevant, da 0 Trades",
+      "overfitting_flags": [
+        "0 von 0 moeglichen Trades ausgeloest - die Kombination aus RSI<15 UND Kurs>SMA200 war im gesamten 6,5-Wochen-Fenster kein einziges Mal gleichzeitig erfuellt.",
+        "Zu kurzes Fenster fuer eine derart seltene Bedingung - das Fenster wurde absichtlich klein gewaehlt, um genau dieses Verhalten zu provozieren (siehe docs/04-roadmap.md, Phase 1).",
+        "Kein Out-of-Sample-Test moeglich, da bereits das In-Sample-Fenster keine einzige Beobachtung liefert."
+      ],
+      "backtest_links": {
+        "in_sample": "https://mcp-api.trader.dev/backtest/01M2R0DEPCBBE41X4NB9429PPR"
+      },
+      "verdict": "not_testable",
+      "rationale": "0 Trades bedeuten: Es gibt schlicht keine Datenbasis, um irgendeine Aussage ueber die Qualitaet dieser Hypothese zu treffen - weder positiv noch negativ. Ein Verdikt 'validated' oder 'rejected' waere hier unbegruendbar. Dies ist der in der Roadmap explizit vorgesehene Testfall fuer 'Erkennt der Validator eine nicht belastbare Strategie mit zu wenigen Trades' - hier im Extremfall sogar mit null Trades statt nur wenigen."
+    }
+  ],
+  "tooling_limitations_discovered": [
+    {
+      "issue": "Buy&Hold-Baseline ueber tradingkit/quick_backtest nicht messbar",
+      "detail": "Ein 'Kaufen und nie verkaufen'-Pine-Skript (Entry auf der ersten Bar, kein Exit) wird von der Engine offenbar nicht als abgeschlossener Trade gezaehlt: totalTrades=0, netProfit=0 und die per-Bar-Equity-Kurve bleibt ueber das gesamte Fenster exakt auf dem Startkapital (10000), obwohl eine Long-Position rein logisch haette offen sein muessen. Die Engine scheint ausschliesslich realisierte (geschlossene) Trades in ihren Kennzahlen zu erfassen, keine unrealisierte Mark-to-Market-Bewertung offener Positionen. Zwei unabhaengige Implementierungen (bar_index==0 und var-bool-Flag) zeigten dasselbe Verhalten - es handelt sich vermutlich um eine Tooling-Eigenschaft, nicht um einen Prompt-/Logikfehler.",
+      "impact": "Agent 3s Regel, jede Hypothese gegen eine Baseline (z. B. Buy&Hold) zu vergleichen, konnte in diesem Testlauf nicht wie vorgesehen umgesetzt werden. Ersatzweise wurde die Bewertung ausschliesslich anhand von In-Sample-vs-Out-of-Sample-Konsistenz und Profit-Factor/Sharpe vorgenommen.",
+      "recommendation": "Vor Phase 2 klaeren, ob tradingkit eine andere Methode fuer Buy&Hold-Baselines vorsieht (z. B. ueber die Web-Oberflaeche/REST-API statt Pine-Backtest), oder eine strategie- und tool-unabhaengige Baseline (einfache Kursveraenderung ueber den Zeitraum, z. B. via TradingView-OHLCV) als Ersatz in Agent 3s Prompt ergaenzen."
+    }
+  ]
+}
