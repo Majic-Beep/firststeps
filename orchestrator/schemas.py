@@ -192,7 +192,7 @@ APPROVED_ORDERS_SCHEMA = {
 # ---------------------------------------------------------------------------
 EXECUTION_ITEM_SCHEMA = {
     "type": "object",
-    "required": ["symbol", "requested", "status"],
+    "required": ["symbol", "requested", "status", "tp_sl_proposed"],
     "properties": {
         "symbol": {"type": "string"},
         "requested": {"type": "object"},
@@ -206,6 +206,11 @@ EXECUTION_ITEM_SCHEMA = {
                 "executed",
             ],
         },
+        # Added after the real 2026-09-17 cycle showed TP/SL was silently
+        # skipped at preparation time, in violation of agents/06's Regel 3.
+        # A schema requirement makes that omission impossible to miss in
+        # code review, instead of relying on an agent remembering the rule.
+        "tp_sl_proposed": {"type": "boolean"},
     },
 }
 
@@ -215,6 +220,61 @@ EXECUTION_REPORT_SCHEMA = {
     "properties": {"executions": {"type": "array", "items": EXECUTION_ITEM_SCHEMA}},
 }
 
+# ---------------------------------------------------------------------------
+# Agent 7 — Lern-Agent (agents/07-learning-postmortem.md)
+# ---------------------------------------------------------------------------
+PROPOSED_CHANGE_SCHEMA = {
+    "type": "object",
+    "required": ["target", "change", "justification", "requires_review_before_activation"],
+    "properties": {
+        "target": {"type": "string"},
+        "change": {"type": "string"},
+        "justification": {"type": "string"},
+        "requires_review_before_activation": {"type": "boolean"},
+    },
+}
+
+LEARNING_REPORT_SCHEMA = {
+    "type": "object",
+    "required": ["cycle_id", "root_cause", "recurring_pattern", "proposed_changes", "watch_items"],
+    "properties": {
+        "cycle_id": {"type": "string"},
+        "root_cause": {
+            "type": "object",
+            "required": ["stage", "type", "explanation"],
+            "properties": {
+                "stage": {
+                    "type": "string",
+                    "enum": [
+                        "agent1",
+                        "agent2",
+                        "agent3",
+                        "agent4",
+                        "agent5",
+                        "agent6",
+                        "kein_fehler_normale_varianz",
+                    ],
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["prozessfehler", "ergebnisfehler_bei_korrektem_prozess"],
+                },
+                "explanation": {"type": "string"},
+            },
+        },
+        "recurring_pattern": {
+            "type": "object",
+            "required": ["is_recurring", "prior_occurrences"],
+            "properties": {
+                "is_recurring": {"type": "boolean"},
+                "prior_occurrences": {"type": "array"},
+            },
+        },
+        "proposed_changes": {"type": "array", "items": PROPOSED_CHANGE_SCHEMA},
+        "watch_items": {"type": "array", "items": {"type": "string"}},
+    },
+}
+
 SCHEMAS_BY_STAGE = {
     "agent1_market_analyst": MARKET_BRIEF_SCHEMA,
     "agent2_strategist": HYPOTHESES_SCHEMA,
@@ -222,4 +282,5 @@ SCHEMAS_BY_STAGE = {
     "agent4_risk_manager": RISK_VERDICT_SCHEMA,
     "agent5_portfolio_manager": APPROVED_ORDERS_SCHEMA,
     "agent6_execution_trader": EXECUTION_REPORT_SCHEMA,
+    "agent7_learning": LEARNING_REPORT_SCHEMA,
 }
