@@ -1,0 +1,37 @@
+{
+  "environment": "Co-Invest-MCP (Liquid-Plattform), Paper-Trading-Modus (verifiziert vor jeder Aktion via paper_trading_status und erneutem enable_paper_trading)",
+  "pre_existing_state": {
+    "note": "Das Paper-Portfolio hatte bereits VOR diesem Test eine bestehende Position, die nicht aus dieser Pipeline stammt.",
+    "positions": [{"symbol": "xyz:TSLA-PERP", "side": "long", "size": "0.028", "entryPx": "353.39", "tp": null, "sl": null}],
+    "equity": "10000.39"
+  },
+  "approved_order_being_executed": {
+    "source": "tests/chain-agent1-2-3-4-5/05-approved-orders-2026-09-17.json",
+    "symbol_analysis_venue": "BYBIT:ETHUSDT.P (tradingkit/Bybit - wo Agent 3 den Backtest gerechnet hat)",
+    "symbol_execution_venue": "ETH (Co-Invest/Liquid - dritte, wiederum eigene Symbol-Notation)",
+    "direction": "long",
+    "size_usd_notional": 1000,
+    "leverage": 1,
+    "position_pct_of_capital": 0.10
+  },
+  "tool_calls_made": [
+    {"tool": "paper_trading_status", "result": "bereits aktiv"},
+    {"tool": "enable_paper_trading", "result": "bereits aktiv, idempotent bestaetigt"},
+    {"tool": "get_portfolio", "result": "Ausgangszustand erfasst (siehe pre_existing_state)"},
+    {"tool": "search_markets(query=ETH)", "result": "Symbol 'ETH' auf Liquid bestaetigt"},
+    {"tool": "view_open_orders", "result": "keine offenen Orders"},
+    {"tool": "suggest_order(asset=ETH, side=long, size=1000, leverage=1, mode=paper)", "result": "status=ready_to_view, reviewUrl erzeugt, KEINE Ausfuehrung"},
+    {"tool": "get_portfolio (erneut)", "result": "unveraendert - keine ETH-Position, nur die bestehende TSLA-Position - bestaetigt, dass suggest_order nichts ausgefuehrt hat"}
+  ],
+  "central_finding": {
+    "title": "execute_order und execute_tpsl sind NICHT direkt vom Agenten aufrufbar",
+    "detail": "Die Tool-Beschreibungen von execute_order und execute_tpsl in diesem MCP-Server sagen woertlich: 'INTERNAL — called only by the confirmation widget. Do not call directly' bzw. 'SYSTEM INTERNAL ... The model must NEVER call this tool directly.' suggest_order bereitet lediglich einen Review-Link vor (reviewUrl, hier mit mode=paper), den ein MENSCH oeffnen und in der Liquid-Oberflaeche bestaetigen muss, bevor ueberhaupt eine simulierte Ausfuehrung stattfindet. Das gilt AUSNAHMSLOS - auch im reinen Paper-Modus, auch fuer eine bereits durch vier vorgelagerte Agenten geprueft und freigegebene Order.",
+    "consequence_for_agents_06_prompt": "agents/06-execution-trader.md ging bisher davon aus, dass der Execution-Trader execute_order/execute_tpsl SELBST aufruft (siehe empfohlene Werkzeuge und Regel 3). Das ist auf dieser Plattform technisch nicht moeglich. Der Prompt wurde entsprechend korrigiert (siehe Commit) - Agent 6s tatsaechliche Rolle endet bei der Order-VORBEREITUNG (Aequivalent zu suggest_order) plus Weitergabe des Review-Links an einen Menschen.",
+    "positive_reading": "Das ist keine Einschraenkung, die umgangen werden sollte, sondern eine eingebaute Sicherheitseigenschaft der Plattform selbst - sie erzwingt strukturell genau das 'Mensch im Loop', das in docs/03-risiken-empfehlungen.md ohnehin als Empfehlung fuer den Live-Betrieb stand. Hier gilt es bereits ab Paper-Trading, nicht erst ab Phase 4 der Roadmap."
+  },
+  "safety_checks_confirmed": [
+    "Order wurde ausschliesslich im Paper-Modus vorbereitet (executionMode: 'paper' in der Tool-Antwort bestaetigt).",
+    "Die bestehende, pipeline-fremde TSLA-Position wurde nicht angeruehrt - es gibt ohnehin kein Tool, um eine Position direkt zu schliessen (get_portfolio-Beschreibung: 'there is no direct close tool available to you').",
+    "Kein API-Zugriff auf echtes Kapital in diesem gesamten Testlauf."
+  ]
+}

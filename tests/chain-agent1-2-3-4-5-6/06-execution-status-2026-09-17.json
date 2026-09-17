@@ -1,0 +1,22 @@
+{
+  "input_source": "tests/chain-agent1-2-3-4-5/05-approved-orders-2026-09-17.json",
+  "approved_order": {"symbol": "BYBIT:ETHUSDT.P", "direction": "long", "position_pct": 0.10},
+  "execution_platform": "Co-Invest (Liquid), Paper-Modus, verifiziert vor Ausfuehrung",
+  "execution_symbol_used": "ETH",
+  "prepared_order": {
+    "asset": "ETH",
+    "side": "long",
+    "orderType": "market",
+    "size_usd_notional": 1000,
+    "leverage": 1,
+    "sizeBasis": "notional",
+    "executionMode": "paper",
+    "reviewUrl": "https://app.liquid.trade/trade/ETH?side=long&orderType=market&size=1000&sizeUnit=USDC&leverage=1&mode=paper"
+  },
+  "status": "AWAITING_HUMAN_CONFIRMATION",
+  "explanation": "Die Pipeline (Agent 1 bis 5) hat die Order vollstaendig hergeleitet, geprueft und freigegeben. Agent 6 hat die Order technisch korrekt im Paper-Modus vorbereitet (siehe tests/phase1-agent6). Die tatsaechliche Ausfuehrung (auch im Paper-Modus) erfordert zwingend eine menschliche Bestaetigung ueber die Liquid-Oberflaeche via reviewUrl - das ist keine Design-Entscheidung dieser Pipeline, sondern eine technische Eigenschaft der Co-Invest-Plattform selbst. Der Zyklus endet an dieser Stelle bewusst offen.",
+  "portfolio_after_this_step": {
+    "note": "Unveraendert gegenueber dem Ausgangszustand - keine ETH-Position vorhanden, nur die bereits vorher bestehende, pipeline-fremde TSLA-Position.",
+    "verified_via": "get_portfolio, zweimal aufgerufen (vor und nach suggest_order)"
+  }
+}
