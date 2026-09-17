@@ -1,0 +1,60 @@
+{
+  "scenario_A_veto_is_binding": {
+    "description": "Prueft Regel 1: Ein Veto von Agent 4 ist bindend, egal wie gut die Hypothese sonst aussieht (hier: Validator-Verdikt 'validated', hohe Konfidenz - trotzdem geveto't).",
+    "input": {
+      "current_portfolio": {"positions": [], "available_capital_pct": 1.0},
+      "candidates": [
+        {"symbol": "BYBIT:XRPUSDT.P", "direction": "long", "validator_verdict": "validated", "confidence": 0.75, "risk_verdict": {"veto": true, "veto_reason": "Globales Tagesverlustlimit ueberschritten", "max_position_pct": 0.0}}
+      ]
+    },
+    "output": {
+      "approved_orders": [],
+      "rejected_hypotheses": [
+        {"symbol": "BYBIT:XRPUSDT.P", "reason": "Bindendes Veto von Agent 4 (Tagesverlustlimit ueberschritten). Wird nicht umgesetzt, unabhaengig vom starken Validator-Verdikt ('validated') und der hohen Konfidenz (0.75) - Regel 1 dieses Agenten laesst hier keinen Interpretationsspielraum."}
+      ],
+      "existing_position_actions": [],
+      "capital_summary": {"available_pct": 1.0, "newly_allocated_pct": 0.0}
+    }
+  },
+  "scenario_B_existing_position_contradicts_new_thesis": {
+    "description": "Prueft Regel 4: Eine bestehende Position, die einer neuen, gegenlaeufigen Hypothese widerspricht, muss explizit adressiert werden.",
+    "input": {
+      "current_portfolio": {"positions": [{"symbol": "BYBIT:BTCUSDT.P", "direction": "long", "position_pct": 0.08, "opened_cycle": "vorheriger Zyklus"}], "available_capital_pct": 0.92},
+      "candidates": [
+        {"symbol": "BYBIT:BTCUSDT.P", "direction": "short", "validator_verdict": "validated_with_caveats", "confidence": 0.55, "risk_verdict": {"veto": false, "max_position_pct": 0.06}, "note": "Neue Bear-These seit letztem Zyklus (hypothetisch: veraendertes Makro-Bild) widerspricht der bestehenden Long-Position direkt."}
+      ]
+    },
+    "output": {
+      "approved_orders": [
+        {"symbol": "BYBIT:BTCUSDT.P", "direction": "short", "position_pct": 0.06, "entry_condition": "gemaess Agent-2-Hypothese dieses Zyklus", "take_profit": "gemaess Agent-2-Hypothese", "stop_loss": "gemaess Agent-2-Hypothese", "rationale": "Risikofreigabe vorhanden (max 6%), Validator-Verdikt 'validated_with_caveats'. Wird trotz mittlerer statt hoher Konfidenz umgesetzt, weil die bestehende Long-Position ohnehin geschlossen wird (siehe existing_position_actions) - keine widerspruechliche Netto-Position im Portfolio."}
+      ],
+      "rejected_hypotheses": [],
+      "existing_position_actions": [
+        {"symbol": "BYBIT:BTCUSDT.P", "action": "schliessen", "rationale": "Die bestehende Long-Position (8%) widerspricht direkt der neuen, risikofreigegebenen Short-These fuer denselben Zyklus. Ein gleichzeitiges Halten von Long UND Short im selben Symbol waere keine bewusste Hedging-Strategie, sondern ein Widerspruch, der nicht stillschweigend nebeneinander stehen bleiben darf (Regel 4). Schliessen statt Reduzieren, weil die neue These die alte These direkt negiert, nicht nur relativiert."}
+      ],
+      "capital_summary": {"available_pct": 0.92, "newly_allocated_pct": 0.06}
+    }
+  },
+  "scenario_C_capital_constrained_prioritization": {
+    "description": "Prueft Regeln 3 und 5: Wenn die Summe der risikofreigegebenen Positionsgroessen das verfuegbare Kapital uebersteigt, wird nach Verdikt-Qualitaet UND Diversifikation priorisiert, und niedriger priorisierte Hypothesen werden VOLLSTAENDIG verworfen statt alle proportional zu verkleinern.",
+    "input": {
+      "current_portfolio": {"positions": [], "available_capital_pct": 1.0},
+      "candidates": [
+        {"symbol": "SYMBOL_A", "direction": "long", "validator_verdict": "validated", "confidence": 0.70, "risk_verdict": {"veto": false, "max_position_pct": 0.50}, "correlation_to_others": {"SYMBOL_B": 0.85, "SYMBOL_C": 0.10}},
+        {"symbol": "SYMBOL_B", "direction": "long", "validator_verdict": "validated_with_caveats", "confidence": 0.50, "risk_verdict": {"veto": false, "max_position_pct": 0.40}, "correlation_to_others": {"SYMBOL_A": 0.85, "SYMBOL_C": 0.15}},
+        {"symbol": "SYMBOL_C", "direction": "long", "validator_verdict": "validated_with_caveats", "confidence": 0.55, "risk_verdict": {"veto": false, "max_position_pct": 0.35}, "correlation_to_others": {"SYMBOL_A": 0.10, "SYMBOL_B": 0.15}}
+      ]
+    },
+    "output": {
+      "approved_orders": [
+        {"symbol": "SYMBOL_A", "direction": "long", "position_pct": 0.50, "rationale": "Hoechste Prioritaet: einziger Kandidat mit Verdikt 'validated' (nicht nur 'validated_with_caveats') UND hoechste Konfidenz (0.70). Volle risikofreigegebene Groesse genutzt."},
+        {"symbol": "SYMBOL_C", "direction": "long", "position_pct": 0.35, "rationale": "Zweite Prioritaet trotz gleichem Verdikt wie SYMBOL_B ('validated_with_caveats') und aehnlicher Konfidenz (0.55 vs. 0.50), weil SYMBOL_C kaum mit SYMBOL_A korreliert ist (0.10) - echter Diversifikationsbeitrag zum Portfolio, waehrend SYMBOL_B mit SYMBOL_A stark korreliert ist (0.85) und daher wirtschaftlich eine aehnliche Wette waere."}
+      ],
+      "rejected_hypotheses": [
+        {"symbol": "SYMBOL_B", "reason": "Kapital nach SYMBOL_A (50%) und SYMBOL_C (35%) nur noch zu 15% verfuegbar - deutlich unter der risikofreigegebenen Groesse von 40%. Statt eine fragmentierte 15%-Mini-Position zu eroeffnen (ineffizient wegen relativ hoeherer Kosten, siehe Regel 5), wird SYMBOL_B vollstaendig verworfen. Zusaetzlich gerechtfertigt durch die hohe Korrelation zu SYMBOL_A (0.85) - der marginale Diversifikationsbeitrag waere ohnehin gering gewesen."}
+      ],
+      "existing_position_actions": [],
+      "capital_summary": {"available_pct": 1.0, "newly_allocated_pct": 0.85}
+    }
+  }
+}
