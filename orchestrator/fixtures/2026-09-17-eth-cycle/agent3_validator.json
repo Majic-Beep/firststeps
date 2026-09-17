@@ -1,0 +1,35 @@
+{
+  "results": [
+    {
+      "symbol": "BYBIT:BTCUSDT.P",
+      "hypothesis_ref": "BTCUSDT - Trend mit RSI-Filter",
+      "in_sample": {"return_pct": 54.62, "sharpe": 0.69, "max_drawdown_pct": 25.41, "num_trades": 45},
+      "out_of_sample": {"return_pct": -3.54, "sharpe": 0.03, "max_drawdown_pct": 26.68, "num_trades": 38},
+      "costs_included": true,
+      "overfitting_flags": ["Grosse Kluft zwischen In-Sample (+54.6%) und Out-of-Sample (-3.5%)."],
+      "verdict": "rejected",
+      "rationale": "Out-of-Sample netto negativ - Edge zerfaellt ausserhalb des Trainingsfensters."
+    },
+    {
+      "symbol": "BYBIT:ETHUSDT.P",
+      "hypothesis_ref": "ETHUSDT - Trend mit RSI-Filter",
+      "in_sample": {"return_pct": 57.76, "sharpe": 0.65, "max_drawdown_pct": 29.74, "num_trades": 48},
+      "out_of_sample": {"return_pct": 6.81, "sharpe": 0.24, "max_drawdown_pct": 32.63, "num_trades": 36, "profit_factor": 1.08},
+      "costs_included": true,
+      "overfitting_flags": ["Erhebliche Erosion IS->OOS, aber OOS bleibt knapp positiv."],
+      "verdict": "validated_with_caveats",
+      "rationale": "Einziges Symbol mit tatsaechlich positivem Out-of-Sample-Ergebnis (PF 1.08)."
+    },
+    {
+      "symbol": "BYBIT:SOLUSDT.P",
+      "hypothesis_ref": "SOLUSDT - Trend mit RSI-Filter",
+      "in_sample": {"return_pct": 133.25, "sharpe": 0.85, "max_drawdown_pct": 49.21, "num_trades": 54},
+      "out_of_sample": {"return_pct": -19.75, "sharpe": -0.06, "max_drawdown_pct": 43.70, "num_trades": 42},
+      "costs_included": true,
+      "overfitting_flags": ["Staerkste In-Sample-Performance kippt am staerksten ins Negative."],
+      "verdict": "rejected",
+      "rationale": "Trotz staerkster Einzelthese schwaechstes Out-of-Sample-Ergebnis der drei Symbole."
+    }
+  ],
+  "_provenance": "Reale Backtest-Ergebnisse (echte tradingkit-Engine) aus tests/chain-agent1-2-3/03-validated-hypotheses-crypto-2026-09-17.json."
+}

@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-09-17T15:45:00Z",
+  "universe": ["BYBIT:BTCUSDT.P", "BYBIT:ETHUSDT.P", "BYBIT:SOLUSDT.P"],
+  "macro": {
+    "regime": "risk-on trotz Regulierungs-Rueckschlag",
+    "regime_confidence": 0.5
+  },
+  "per_symbol": {
+    "BYBIT:BTCUSDT.P": {"technical_summary": "mostly_bullish: 1D Buy, 4h Neutral, 1W Neutral", "sentiment_score": 0.1},
+    "BYBIT:ETHUSDT.P": {"technical_summary": "mostly_bullish: 1D Buy, 4h Buy, 1W Neutral", "sentiment_score": 0.0},
+    "BYBIT:SOLUSDT.P": {"technical_summary": "mostly_bullish: 1D Buy, 4h Buy, 1W Neutral", "sentiment_score": 0.4}
+  },
+  "cross_symbol": {
+    "correlation_matrix_30d_1D_returns": {
+      "pairs": [
+        {"pair": ["BTC", "ETH"], "correlation": 0.88},
+        {"pair": ["ETH", "SOL"], "correlation": 0.83},
+        {"pair": ["BTC", "SOL"], "correlation": 0.829}
+      ]
+    }
+  },
+  "sources": [
+    "tradingview:get_quotes_batch",
+    "tradingview:analyze_multi_timeframe_batch",
+    "tradingview:calculate_correlation_tool",
+    "tradingview:get_news"
+  ],
+  "_provenance": "Reale Werte aus tests/chain-agent1-2-3/01-market-brief-crypto-2026-09-17.json, fuer dieses Fixture gekuerzt."
+}

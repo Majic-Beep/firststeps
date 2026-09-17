@@ -1,0 +1,13 @@
+{
+  "executions": [
+    {
+      "symbol": "ETH",
+      "requested": {"direction": "long", "position_pct": 0.10},
+      "status": "prepared_awaiting_human_confirmation",
+      "review_url": "https://app.liquid.trade/trade/ETH?side=long&orderType=market&size=1000&sizeUnit=USDC&leverage=1&mode=paper",
+      "tp_sl_set": false,
+      "reason": "Co-Invest/Liquid erlaubt keine direkte Ausfuehrung durch einen Agenten - execute_order/execute_tpsl sind ausschliesslich fuer die menschliche Bestaetigungs-Oberflaeche bestimmt (siehe agents/06-execution-trader.md und tests/phase1-agent6/evaluation-2026-09-17.md). Die Order ist korrekt im Paper-Modus vorbereitet, aber nicht ausgefuehrt."
+    }
+  ],
+  "_provenance": "Realer Tool-Aufruf gegen Co-Invest am 2026-09-17, siehe tests/chain-agent1-2-3-4-5-6/06-execution-status-2026-09-17.json. Dies ist der tatsaechliche, unveraenderte Endzustand - keine simulierte Ausfuehrung wurde erfunden."
+}

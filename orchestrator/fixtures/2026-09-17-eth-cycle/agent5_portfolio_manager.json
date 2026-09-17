@@ -1,0 +1,17 @@
+{
+  "approved_orders": [
+    {
+      "symbol": "BYBIT:ETHUSDT.P",
+      "direction": "long",
+      "position_pct": 0.10,
+      "entry_condition": "Tagesschluss (close) > EMA(20) UND RSI(14) zwischen 45 und 65",
+      "take_profit": "kein fixes Kursziel - regelbasierter Ausstieg",
+      "stop_loss": "Tagesschluss < EMA(20) ODER RSI(14) > 75",
+      "rationale": "Einziger verbleibender Kandidat, von Agent 4 ohne Veto freigegeben. Volle risikofreigegebene Groesse genutzt, da keine Kapitalknappheit vorliegt."
+    }
+  ],
+  "rejected_hypotheses": [],
+  "existing_position_actions": [],
+  "capital_summary": {"available_pct": 1.0, "newly_allocated_pct": 0.10},
+  "_provenance": "Reale Werte aus tests/chain-agent1-2-3-4-5/05-approved-orders-2026-09-17.json."
+}

@@ -1,0 +1,6 @@
+{
+  "positions": [],
+  "daily_pnl_pct": 0.0,
+  "available_capital_pct": 1.0,
+  "note": "Realer Ausgangszustand aus tests/chain-agent1-2-3-4/04-risk-verdict-2026-09-17.json: leeres Portfolio, erster Zyklus dieser Testreihe."
+}

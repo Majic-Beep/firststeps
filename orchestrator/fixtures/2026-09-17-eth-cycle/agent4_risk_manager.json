@@ -1,0 +1,18 @@
+{
+  "portfolio_level_flags": [
+    "Leeres Portfolio - kein Korrelations-/Konzentrationsrisiko aus bestehenden Positionen ableitbar.",
+    "Einziger Kandidat des Zyklus (BTC und SOL bereits von Agent 3 verworfen, erreichen Agent 4 nicht)."
+  ],
+  "correlation_clusters": [],
+  "verdicts": [
+    {
+      "symbol": "BYBIT:ETHUSDT.P",
+      "veto": false,
+      "risk_level": "mittel",
+      "max_position_pct": 0.10,
+      "rationale": "Keine harten Limits verletzt. 'Mittel' statt 'niedrig' wegen Agent 3s schwachen Out-of-Sample-Kennzahlen (Sharpe 0.24, Max Drawdown 32.6%) trotz fehlender Limit-Verletzung."
+    }
+  ],
+  "global_veto": false,
+  "_provenance": "Reale Werte aus tests/chain-agent1-2-3-4/04-risk-verdict-2026-09-17.json."
+}

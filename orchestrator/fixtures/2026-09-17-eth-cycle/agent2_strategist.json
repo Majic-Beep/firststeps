@@ -1,0 +1,48 @@
+{
+  "hypotheses": [
+    {
+      "symbol": "BYBIT:BTCUSDT.P",
+      "timeframe": "1D",
+      "direction": "long",
+      "entry_condition": "Tagesschluss (close) > EMA(20) UND RSI(14) zwischen 45 und 65",
+      "exit_take_profit": "kein fixes Kursziel - Ausstieg regelbasiert",
+      "exit_stop_loss": "Tagesschluss < EMA(20) ODER RSI(14) > 75",
+      "time_horizon": "mittelfristig (Tage bis wenige Wochen), 1D-Chart",
+      "suggested_position_pct": 0.15,
+      "confidence": 0.5,
+      "bull_summary": "Preis ueber allen relevanten 1D-Durchschnitten, RSI 51.5 mit Aufwaertsraum.",
+      "bear_summary": "ETF-Outflows als nicht-technisches Warnsignal.",
+      "resolution_rationale": "Technische Struktur eindeutiger belegt als die Bear-These."
+    },
+    {
+      "symbol": "BYBIT:ETHUSDT.P",
+      "timeframe": "1D",
+      "direction": "long",
+      "entry_condition": "Tagesschluss (close) > EMA(20) UND RSI(14) zwischen 45 und 65",
+      "exit_take_profit": "kein fixes Kursziel - Ausstieg regelbasiert",
+      "exit_stop_loss": "Tagesschluss < EMA(20) ODER RSI(14) > 75",
+      "time_horizon": "mittelfristig (Tage bis wenige Wochen), 1D-Chart",
+      "suggested_position_pct": 0.10,
+      "confidence": 0.45,
+      "bull_summary": "1D UND 4h beide Buy, staerker als BTC.",
+      "bear_summary": "1W-Oszillatoren Sell trotz kurzfristig bullischem Bild.",
+      "resolution_rationale": "Aehnlich wie BTC, etwas niedrigere Konfidenz wegen 1W-Divergenz."
+    },
+    {
+      "symbol": "BYBIT:SOLUSDT.P",
+      "timeframe": "1D",
+      "direction": "long",
+      "entry_condition": "Tagesschluss (close) > EMA(20) UND RSI(14) zwischen 45 und 65",
+      "exit_take_profit": "kein fixes Kursziel - Ausstieg regelbasiert",
+      "exit_stop_loss": "Tagesschluss < EMA(20) ODER RSI(14) > 75",
+      "time_horizon": "mittelfristig (Tage bis wenige Wochen), 1D-Chart",
+      "suggested_position_pct": 0.05,
+      "confidence": 0.5,
+      "bull_summary": "Konsistenteste bullische Struktur der drei Symbole.",
+      "bear_summary": "Keine SOL-spezifische Bear-These, nur branchenweite Vorsicht.",
+      "resolution_rationale": "Technisch staerkste Einzelthese, aber Positionsgroesse klein gehalten wegen Korrelation 0.83-0.88 zu BTC/ETH (kein echter Diversifikationsbeitrag)."
+    }
+  ],
+  "no_thesis_symbols": [],
+  "_provenance": "Reale Werte aus tests/chain-agent1-2-3/02-hypotheses-crypto-2026-09-17.json."
+}
