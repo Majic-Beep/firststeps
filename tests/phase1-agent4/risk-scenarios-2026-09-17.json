@@ -1,0 +1,79 @@
+{
+  "scenario_A_normal": {
+    "description": "Realistischer Fall: bestehende BTC-Position aus einem fruehreren Zyklus, ein neuer validierter Kandidat (ETH), Tagesverlust innerhalb der Limits.",
+    "input": {
+      "mandate_limits": {"max_position_pct_per_symbol": 0.20, "max_position_pct_per_cluster": 0.30, "correlation_cluster_threshold": 0.70, "max_daily_loss_pct": 0.05, "max_leverage": 2.0},
+      "current_portfolio": {"positions": [{"symbol": "BYBIT:BTCUSDT.P", "direction": "long", "position_pct": 0.08, "opened_cycle": "vorheriger Zyklus"}], "daily_pnl_pct": -0.012},
+      "correlation_matrix_30d": {"BTC_ETH": 0.88, "ETH_SOL": 0.83, "BTC_SOL": 0.829},
+      "candidate_hypotheses": [{"symbol": "BYBIT:ETHUSDT.P", "direction": "long", "suggested_position_pct": 0.10, "validator_verdict": "validated_with_caveats"}]
+    },
+    "output": {
+      "portfolio_level_flags": ["BTC und ETH bilden bei 0.88 Korrelation ein gemeinsames Cluster (Schwellenwert 0.70) - kombinierte Cluster-Exposure nach Umsetzung waere 18% (8% BTC + 10% ETH), innerhalb des Cluster-Limits von 30%."],
+      "correlation_clusters": [{"symbols": ["BYBIT:BTCUSDT.P", "BYBIT:ETHUSDT.P"], "avg_correlation": 0.88}],
+      "verdicts": [
+        {
+          "symbol": "BYBIT:ETHUSDT.P",
+          "hypothesis_ref": "ETHUSDT - Trend mit RSI-Filter (aus chain-agent1-2-3-test)",
+          "veto": false,
+          "veto_reason": null,
+          "risk_level": "mittel",
+          "max_position_pct": 0.10,
+          "rationale": "Kein hartes Limit verletzt (Einzelposition 10% < 20%, Cluster 18% < 30%, Tagesverlust -1.2% < 5%). Risiko 'mittel' statt 'niedrig' wegen der hohen Korrelation zur bestehenden BTC-Position - beide Positionen reagieren wahrscheinlich gleichgerichtet auf Krypto-Marktbewegungen, echte Diversifikation innerhalb des Portfolios ist begrenzt."
+        }
+      ],
+      "global_veto": false,
+      "global_veto_reason": null
+    }
+  },
+  "scenario_B_hard_veto_daily_loss": {
+    "description": "Stresstest (isoliert, synthetisch): Tagesverlustlimit ist bereits ueberschritten, BEVOR die neue Position ueberhaupt bewertet wird. Prueft, ob Agent 4 unabhaengig von der Qualitaet des Kandidaten korrekt ein globales Veto ausspricht.",
+    "input": {
+      "mandate_limits": {"max_position_pct_per_symbol": 0.20, "max_position_pct_per_cluster": 0.30, "correlation_cluster_threshold": 0.70, "max_daily_loss_pct": 0.05, "max_leverage": 2.0},
+      "current_portfolio": {"positions": [{"symbol": "BYBIT:BTCUSDT.P", "direction": "long", "position_pct": 0.08, "opened_cycle": "vorheriger Zyklus"}], "daily_pnl_pct": -0.061},
+      "candidate_hypotheses": [{"symbol": "BYBIT:ETHUSDT.P", "direction": "long", "suggested_position_pct": 0.10, "validator_verdict": "validated_with_caveats"}]
+    },
+    "output": {
+      "portfolio_level_flags": ["Tagesverlust -6.1% ueberschreitet das Mandats-Limit von 5.0% - hartes, nicht verhandelbares Kriterium."],
+      "correlation_clusters": [],
+      "verdicts": [
+        {
+          "symbol": "BYBIT:ETHUSDT.P",
+          "hypothesis_ref": "ETHUSDT - Trend mit RSI-Filter (aus chain-agent1-2-3-test)",
+          "veto": true,
+          "veto_reason": "Globales Tagesverlustlimit bereits ueberschritten (siehe global_veto) - unabhaengig von der individuellen Qualitaet dieses Kandidaten.",
+          "risk_level": "hoch",
+          "max_position_pct": 0.0,
+          "rationale": "Wird ausschliesslich durch das globale Veto bestimmt, nicht durch eine eigene Bewertung des ETH-Kandidaten."
+        }
+      ],
+      "global_veto": true,
+      "global_veto_reason": "Tagesverlust (-6.1%) ueberschreitet das Mandats-Limit (5.0%). Gemaess Regel 3 des Risikomanager-Prompts gilt dies fuer ALLE neuen Positionen in diesem Zyklus, unabhaengig von deren individueller Qualitaet oder Validator-Verdikt."
+    }
+  },
+  "scenario_C_cluster_limit_would_be_breached": {
+    "description": "Stresstest (isoliert, synthetisch): Die bestehende BTC-Position ist bereits gross genug, dass die volle vorgeschlagene ETH-Position das Cluster-Limit brechen wuerde. Prueft, ob Agent 4 die Position auf das verbleibende Budget kappt statt pauschal zu veto'en oder das Limit zu ignorieren.",
+    "input": {
+      "mandate_limits": {"max_position_pct_per_symbol": 0.20, "max_position_pct_per_cluster": 0.30, "correlation_cluster_threshold": 0.70, "max_daily_loss_pct": 0.05, "max_leverage": 2.0},
+      "current_portfolio": {"positions": [{"symbol": "BYBIT:BTCUSDT.P", "direction": "long", "position_pct": 0.25, "opened_cycle": "vorheriger Zyklus"}], "daily_pnl_pct": 0.008},
+      "correlation_matrix_30d": {"BTC_ETH": 0.88},
+      "candidate_hypotheses": [{"symbol": "BYBIT:ETHUSDT.P", "direction": "long", "suggested_position_pct": 0.10, "validator_verdict": "validated_with_caveats"}]
+    },
+    "output": {
+      "portfolio_level_flags": ["Bestehende BTC-Position (25%) plus voller ETH-Vorschlag (10%) ergaebe 35% Cluster-Exposure - ueberschreitet das Cluster-Limit von 30% um 5 Prozentpunkte."],
+      "correlation_clusters": [{"symbols": ["BYBIT:BTCUSDT.P", "BYBIT:ETHUSDT.P"], "avg_correlation": 0.88}],
+      "verdicts": [
+        {
+          "symbol": "BYBIT:ETHUSDT.P",
+          "hypothesis_ref": "ETHUSDT - Trend mit RSI-Filter (aus chain-agent1-2-3-test)",
+          "veto": false,
+          "veto_reason": null,
+          "risk_level": "hoch",
+          "max_position_pct": 0.05,
+          "rationale": "Volle vorgeschlagene Groesse (10%) wuerde das harte Cluster-Limit (30%) verletzen. Statt die gesamte Hypothese zu veto'en, wird die maximal zulaessige Groesse auf das verbleibende Cluster-Budget gekappt (30% - 25% bestehende BTC-Position = 5%). Das ist kein Ermessensspielraum bei einer Limit-VERLETZUNG (die waere ein Veto), sondern die korrekte Anwendung einer Positionsgroessen-Obergrenze, die das Limit von vornherein einhaelt."
+        }
+      ],
+      "global_veto": false,
+      "global_veto_reason": null
+    }
+  }
+}

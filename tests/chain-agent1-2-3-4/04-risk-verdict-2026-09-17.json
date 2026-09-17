@@ -1,0 +1,32 @@
+{
+  "input_source": "tests/chain-agent1-2-3/03-validated-hypotheses-crypto-2026-09-17.json - nur der einzige Kandidat, der Agent 3 mit einem anderen Verdikt als 'rejected' passiert hat (ETH, validated_with_caveats). BTC und SOL wurden bereits bei Agent 3 verworfen und erreichen Agent 4 planmaess gar nicht erst.",
+    "mandate_limits": {"max_position_pct_per_symbol": 0.20, "max_position_pct_per_cluster": 0.30, "correlation_cluster_threshold": 0.70, "max_daily_loss_pct": 0.05, "max_leverage": 2.0},
+  "current_portfolio": {"positions": [], "daily_pnl_pct": 0.0, "note": "Erster Zyklus dieser Testreihe - realistischerweise ein leeres Portfolio, keine fiktive Vorgeschichte (anders als die synthetischen Stresstests in tests/phase1-agent4/)."},
+  "candidate": {
+    "symbol": "BYBIT:ETHUSDT.P",
+    "direction": "long",
+    "suggested_position_pct": 0.10,
+    "validator_verdict": "validated_with_caveats",
+    "validator_out_of_sample_stats": {"return_pct": 6.81, "sharpe": 0.24, "max_drawdown_pct": 32.63, "profit_factor": 1.08}
+  },
+  "output": {
+    "portfolio_level_flags": [
+      "Leeres Portfolio - kein Korrelations-/Konzentrationsrisiko aus bestehenden Positionen ableitbar.",
+      "Einziger Kandidat des Zyklus - keine Diversifikationsentscheidung zwischen mehreren neuen Positionen noetig."
+    ],
+    "correlation_clusters": [],
+    "verdicts": [
+      {
+        "symbol": "BYBIT:ETHUSDT.P",
+        "hypothesis_ref": "ETHUSDT - Trend mit RSI-Filter (siehe tests/chain-agent1-2-3)",
+        "veto": false,
+        "veto_reason": null,
+        "risk_level": "mittel",
+        "max_position_pct": 0.10,
+        "rationale": "Keine harten Limits verletzt (Position 10% < 20% Einzel-Limit, kein Cluster durch bestehende Positionen, Tagesverlust 0% < 5%). 'Mittel' statt 'niedrig' trotz fehlender Limit-Verletzung, weil Agent 3s eigene Out-of-Sample-Kennzahlen (Sharpe nur 0.24, Max Drawdown 32.6%) bereits selbst auf erhebliche Schwankungsbreite hinweisen - der Validator-Status 'validated_with_caveats' (nicht 'validated') wird hier direkt in eine vorsichtigere Risikoeinstufung uebersetzt, nicht ignoriert. Ueberschlaegiger Beitrag zum Portfolio-Max-Drawdown bei 10% Positionsgroesse und 32.6% Strategie-Drawdown: ca. 3.3 Prozentpunkte (grobe lineare Naeherung, keine exakte Portfolio-Simulation)."
+      }
+    ],
+    "global_veto": false,
+    "global_veto_reason": null
+  }
+}
