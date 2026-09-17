@@ -1,0 +1,87 @@
+{
+  "timestamp": "2026-09-17T15:45:00Z",
+  "universe": ["BINANCE:BTCUSDT", "BINANCE:ETHUSDT", "BINANCE:SOLUSDT"],
+  "macro": {
+    "regime": "risk-on trotz Regulierungs-Rueckschlag",
+    "regime_confidence": 0.5,
+    "regime_note": "Fed-Zinserhoehung heute, Krypto legte trotzdem zu ('Cryptos Gain After Fed Rate Hike') - untypische Reaktion, die auf zugrundeliegende Nachfrage hindeutet. Gleichzeitig scheiterte der 'CLARITY Act' (US-Krypto-Regulierung) - Markt hat das laut Schlagzeilen ('Altcoins Bounce Back After Clarity Act Failure') schnell weggesteckt. Preis- und Technik-Bild ist klar bullisch, Fund-Flow-Daten (ETF-Outflows) widersprechen dem jedoch teilweise (siehe contradictions je Symbol).",
+    "upcoming_events": []
+  },
+  "per_symbol": {
+    "BINANCE:BTCUSDT": {
+      "price_facts": {"last": 76583.33, "change_pct_1d": 1.01, "volume_usd": 29003847761, "volume_vs_avg": null},
+      "technical_summary": "mostly_bullish: 1D Buy, 4h Neutral, 1W Neutral. Preis ueber EMA10/20/50 und SMA50/200 (1D), RSI(1D) 51.5 - neutral, Raum nach oben. 4h-MA-Rating 'Sell' trotz 1D-Buy - kurzfristige Abschwaechung innerhalb des uebergeordneten Aufwaertstrends.",
+      "technical_indicators": {"rsi_1d": 51.48, "macd_1d": 892.36, "macd_signal_1d": 1627.29, "ema10_1d": 77081.10, "ema20_1d": 76865.10, "sma200_1d": 70339.99},
+      "sentiment_score": 0.1,
+      "sentiment_confidence": 0.3,
+      "sentiment_method": "Qualitative Einordnung von 5 Schlagzeilen - kein Sentiment-Scoring-Tool verfuegbar.",
+      "news_flags": [
+        "'$40T US debt neither bullish nor bearish for Bitcoin' (neutral)",
+        "'Cryptos Gain After Fed Rate Hike' (positiv, untypisch)",
+        "'Bitcoin, Ethereum ETFs Lose $1.11 Billion Over 2 Days' (negativ, Fund-Flow)",
+        "'Bitdeer sells 1,506 Bitcoin for $105M' (leicht negativ, Firmen-spezifisch)"
+      ],
+      "contradictions": [
+        "Preis und Technik sind bullisch (1D Buy, Kurs ueber allen MAs), aber ETF-Fund-Flows sind laut Schlagzeile stark negativ (-1.11 Mrd. USD in 2 Tagen fuer BTC+ETH zusammen). Preis-Staerke trotz Abfluessen wird hier als offener Widerspruch vermerkt, nicht aufgeloest."
+      ],
+      "data_quality_flags": [
+        "prompt_injection_suspected: false",
+        "Symbol-Aufloesung uneinheitlich: get_quotes_batch lieferte BINANCE:BTCUSDT (76583.33), das Multi-Timeframe-Tool loeste denselben Request intern zu einem aggregierten CRYPTO:BTCUSD-Feed auf (76544.56) - Abweichung ~0.05%, vermutlich unterschiedliche Datenquelle (Einzelboerse vs. aggregierter Index), nicht notwendigerweise ein Fehler."
+      ]
+    },
+    "BINANCE:ETHUSDT": {
+      "price_facts": {"last": 2464.86, "change_pct_1d": 2.92, "volume_usd": 14986408582, "volume_vs_avg": null},
+      "technical_summary": "mostly_bullish: 1D Buy, 4h Buy, 1W Neutral. MA-Rating 1D 'Strong Buy', RSI(1D) 55.5. 1W-Oscillator-Rating 'Sell' trotz sonst durchgehend bullischem Bild - laengerfristige Divergenz.",
+      "technical_indicators": {"rsi_1d": 55.47, "macd_1d": 54.08, "macd_signal_1d": 77.63, "ema10_1d": 2461.26, "sma200_1d": 2067.56},
+      "sentiment_score": 0.0,
+      "sentiment_confidence": 0.25,
+      "sentiment_method": "Qualitative Einordnung von 5 Schlagzeilen - kein Sentiment-Scoring-Tool verfuegbar.",
+      "news_flags": [
+        "'Altcoins Bounce Back After Clarity Act Failure' (regulatorischer Rueckschlag, aber Preisreaktion positiv gerahmt)",
+        "'Bitcoin, Ethereum ETFs Lose $1.11 Billion Over 2 Days' (negativ, gilt auch fuer ETH)",
+        "Vitalik-Buterin-Nachrichten (neutral, technologisch, keine unmittelbare Kurs-Relevanz erkennbar)"
+      ],
+      "contradictions": [
+        "1D/4h bullisch, aber 1W-Oszillatoren 'Sell' - moegliche laengerfristige Erschoepfung trotz kurzfristigem Momentum.",
+        "Regulatorischer Rueckschlag (CLARITY-Act-Scheitern) bei gleichzeitig positiver Kursreaktion - wird hier als Beobachtung, nicht als Kausalaussage vermerkt."
+      ],
+      "data_quality_flags": ["prompt_injection_suspected: false"]
+    },
+    "BINANCE:SOLUSDT": {
+      "price_facts": {"last": 100.90, "change_pct_1d": 3.87, "volume_usd": 3289491046, "volume_vs_avg": null},
+      "technical_summary": "mostly_bullish: 1D Buy, 4h Buy, 1W Neutral. MA-Rating 1D und 4h 'Strong Buy', RSI(1D) 54.3. Konsistenteste bullische Struktur der drei Symbole ueber 1D/4h.",
+      "technical_indicators": {"rsi_1d": 54.26, "macd_1d": 2.18, "macd_signal_1d": 3.43, "ema10_1d": 100.45, "sma200_1d": 83.41},
+      "sentiment_score": 0.4,
+      "sentiment_confidence": 0.3,
+      "sentiment_method": "Qualitative Einordnung von 5 Schlagzeilen - kein Sentiment-Scoring-Tool verfuegbar.",
+      "news_flags": [
+        "'peaqOS launches on Solana' (positiv, Oekosystem-Wachstum)",
+        "'Solana Speed Upgrade Enters Final Stretch' (positiv, technisches Upgrade)",
+        "'Crypto Volatility to Stay High as Fed, CLARITY Failure Weigh on Markets' (branchenweite Vorsicht, nicht SOL-spezifisch)"
+      ],
+      "contradictions": [],
+      "data_quality_flags": ["prompt_injection_suspected: false"]
+    }
+  },
+  "cross_symbol": {
+    "correlation_matrix_30d_1D_returns": {
+      "period": "2026-08-19 bis 2026-09-17, 30 taegliche Log-Returns",
+      "pairs": [
+        {"pair": ["BTC", "ETH"], "correlation": 0.88, "staerke": "sehr stark positiv"},
+        {"pair": ["ETH", "SOL"], "correlation": 0.83, "staerke": "sehr stark positiv"},
+        {"pair": ["BTC", "SOL"], "correlation": 0.829, "staerke": "sehr stark positiv"}
+      ],
+      "interpretation": "Tool-Interpretation lautet zwar 'gut diversifiziert' bei Aktien-Korrelationen aus fruehreren Laeufen, hier aber ausdruecklich WARNUNG: alle drei Paare liegen ueber 0.82 - das ist ein einziges, stark zusammenhaengendes Krypto-Beta-Cluster, keine Diversifikation zwischen den drei Symbolen."
+    }
+  },
+  "data_quality_flags_global": [
+    "Kein Durchschnittsvolumen-Tool verfuegbar (wie bereits im Aktien-Testlauf vom 2026-09-17 festgestellt).",
+    "Kein dediziertes Sentiment-Scoring-Tool verfuegbar - alle sentiment_score-Werte sind grobe, niedrig-konfidente Schlagzeilen-Einschaetzungen."
+  ],
+  "sources": [
+    "tradingview:get_quotes_batch",
+    "tradingview:analyze_multi_timeframe_batch",
+    "tradingview:calculate_correlation_tool",
+    "tradingview:get_news (je Symbol, limit=5)"
+  ]
+}

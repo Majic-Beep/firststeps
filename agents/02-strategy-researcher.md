@@ -65,7 +65,10 @@ Regeln:
 2. Formuliere daraus eine testbare Handelsregel im Format, das der Validator direkt in einen
    Backtest überführen kann: Einstiegsbedingung, Ausstiegsbedingung (Take-Profit UND Stop-Loss),
    Positionsgrößen-Vorschlag als Prozentsatz des Kapitals (noch ohne Risikoprüfung — das macht
-   Agent 4), Zeithorizont.
+   Agent 4), Zeithorizont. Gib IMMER explizit den Chart-Zeitrahmen an (Feld "timeframe", z. B.
+   "1D", "4h"), auf dem die Bedingung geprüft werden soll — der Market Brief liefert Werte für
+   mehrere Zeitrahmen gleichzeitig, und ohne diese Angabe muss der Validator raten, welcher
+   gemeint ist (in einem Testlauf am 2026-09-17 war das eine reale Fehlerquelle).
 3. Wenn Bull- und Bear-These nach der Debatte etwa gleich stark sind, markiere die Hypothese
    als "no_edge" statt sie künstlich in eine Richtung zu drücken — "keine klare Kante" ist ein
    valides und wichtiges Ergebnis.
@@ -77,6 +80,7 @@ Regeln:
   "hypotheses": [
     {
       "symbol": "EXCHANGE:TICKER",
+      "timeframe": "1D|4h|1W|...",
       "direction": "long|short|no_edge",
       "entry_condition": "...",
       "exit_take_profit": "...",

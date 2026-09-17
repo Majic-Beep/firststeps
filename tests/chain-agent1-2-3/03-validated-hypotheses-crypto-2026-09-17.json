@@ -1,0 +1,74 @@
+{
+  "results": [
+    {
+      "symbol": "BYBIT:BTCUSDT.P",
+      "timeframe": "1D",
+      "hypothesis_ref": "BTCUSDT - Trend mit RSI-Filter (Agent 2, siehe 02-hypotheses)",
+      "backtest_period": {
+        "in_sample": {"start": "2023-01-01", "end": "2025-01-01"},
+        "out_of_sample": {"start": "2025-01-01", "end": "2026-09-01"}
+      },
+      "in_sample": {"return_pct": 54.62, "sharpe": 0.69, "max_drawdown_pct": 25.41, "win_rate_pct": 35.56, "num_trades": 45, "profit_factor": 1.50},
+      "out_of_sample": {"return_pct": -3.54, "sharpe": 0.03, "max_drawdown_pct": 26.68, "win_rate_pct": 15.79, "num_trades": 38, "profit_factor": 0.94},
+      "costs_included": true,
+      "overfitting_flags": [
+        "In-Sample deutlich profitabel (+54.6%, Sharpe 0.69), Out-of-Sample knapp negativ (-3.5%, Sharpe ~0) - Edge zerfaellt fast vollstaendig ausserhalb des Trainingsfensters.",
+        "Trefferquote faellt von 35.6% auf 15.8% - deutlicher Rueckgang."
+      ],
+      "backtest_links": {
+        "in_sample": "https://mcp-api.trader.dev/backtest/01M2R13RQCP6FAATMZERX9WS2D",
+        "out_of_sample": "https://mcp-api.trader.dev/backtest/01M2R149Z6N1GYSJ5HVXRA57FZ"
+      },
+      "verdict": "rejected",
+      "rationale": "Out-of-Sample-Ergebnis ist netto negativ (-3.5%) bei nahezu neutralem Sharpe (0.03) - das erfuellt nicht die Anforderung 'positiv, aber mit Schwaechen' fuer validated_with_caveats. Die In-Sample-Staerke war ueberwiegend ein Artefakt des Backtest-Zeitraums."
+    },
+    {
+      "symbol": "BYBIT:ETHUSDT.P",
+      "timeframe": "1D",
+      "hypothesis_ref": "ETHUSDT - Trend mit RSI-Filter (Agent 2, siehe 02-hypotheses)",
+      "backtest_period": {
+        "in_sample": {"start": "2023-01-01", "end": "2025-01-01"},
+        "out_of_sample": {"start": "2025-01-01", "end": "2026-09-01"}
+      },
+      "in_sample": {"return_pct": 57.76, "sharpe": 0.65, "max_drawdown_pct": 29.74, "win_rate_pct": 25.00, "num_trades": 48, "profit_factor": 1.55},
+      "out_of_sample": {"return_pct": 6.81, "sharpe": 0.24, "max_drawdown_pct": 32.63, "win_rate_pct": 27.78, "num_trades": 36, "profit_factor": 1.08},
+      "costs_included": true,
+      "overfitting_flags": [
+        "Deutlicher Rueckgang von In-Sample zu Out-of-Sample (Return -88% relativ, Sharpe -63% relativ), ABER Out-of-Sample bleibt knapp positiv (Profit Factor 1.08 > 1)."
+      ],
+      "backtest_links": {
+        "in_sample": "https://mcp-api.trader.dev/backtest/01M2R13VGVJ248RZ4F1FKF8EYC",
+        "out_of_sample": "https://mcp-api.trader.dev/backtest/01M2R14D4F6HNER938VARB9857"
+      },
+      "verdict": "validated_with_caveats",
+      "rationale": "Einziges der drei Symbole mit einem tatsaechlich positiven Out-of-Sample-Ergebnis (+6.8%, PF 1.08). Die Erosion gegenueber In-Sample ist erheblich und muss als Warnsignal benannt werden - 'validated_with_caveats', nicht 'validated', da laut Validator-Prompt (Regel 7) ein uneingeschraenktes 'validated' bei so grosser IS/OOS-Differenz nicht zulaessig ist."
+    },
+    {
+      "symbol": "BYBIT:SOLUSDT.P",
+      "timeframe": "1D",
+      "hypothesis_ref": "SOLUSDT - Trend mit RSI-Filter (Agent 2, siehe 02-hypotheses)",
+      "backtest_period": {
+        "in_sample": {"start": "2023-01-01", "end": "2025-01-01"},
+        "out_of_sample": {"start": "2025-01-01", "end": "2026-09-01"}
+      },
+      "in_sample": {"return_pct": 133.25, "sharpe": 0.85, "max_drawdown_pct": 49.21, "win_rate_pct": 29.63, "num_trades": 54, "profit_factor": 1.44},
+      "out_of_sample": {"return_pct": -19.75, "sharpe": -0.06, "max_drawdown_pct": 43.70, "win_rate_pct": 23.81, "num_trades": 42, "profit_factor": 0.84},
+      "costs_included": true,
+      "overfitting_flags": [
+        "Staerkste In-Sample-Performance der drei Symbole (+133.2%) kippt am staerksten ins Negative (-19.7%) - klassisches Overfitting-/Regimewechsel-Muster, analog zur EMA20/50-Hypothese aus dem vorherigen Agent-3-Solotest.",
+        "Max Drawdown bleibt in beiden Fenstern sehr hoch (49.2% / 43.7%) - unabhaengig vom Vorzeichen der Rendite ein Risikosignal fuer sich."
+      ],
+      "backtest_links": {
+        "in_sample": "https://mcp-api.trader.dev/backtest/01M2R13YDC2WT3179NQPTM2HV8",
+        "out_of_sample": "https://mcp-api.trader.dev/backtest/01M2R14FM6T87SYR29Z757J9DW"
+      },
+      "verdict": "rejected",
+      "rationale": "Trotz der technisch staerksten Einzelthese (siehe Agent 2) liefert exakt dieselbe Handelsregel auf SOL das schwaechste Out-of-Sample-Ergebnis der drei Symbole. Das zeigt: hohe Korrelation der Kursbewegungen (0.82-0.88, siehe Market Brief) bedeutet NICHT, dass eine Handelsregel auf allen drei Symbolen gleich gut funktioniert - jedes Symbol muss einzeln validiert werden, unabhaengig von Cross-Symbol-Aehnlichkeit."
+    }
+  ],
+  "portfolio_level_summary": {
+    "validated": ["BYBIT:ETHUSDT.P"],
+    "rejected": ["BYBIT:BTCUSDT.P", "BYBIT:SOLUSDT.P"],
+    "note": "Von den drei technisch fast identisch bullisch eingestuften Symbolen (Agent 1) mit fast identischer Handelsregel (Agent 2) uebersteht nur eines (ETH) die Out-of-Sample-Pruefung mit einem Verdikt jenseits von 'rejected'. Das ist ein starkes empirisches Argument fuer den Validator als eigenstaendige Pflicht-Stufe der Pipeline - weder die Markteinschaetzung noch die Strategie-Debatte allein haetten diesen Unterschied zwischen den drei Symbolen aufgedeckt."
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "hypotheses": [
+    {
+      "symbol": "BTCUSDT",
+      "resolved_instrument": "BYBIT:BTCUSDT.P (fuer Backtest/Exekution) - Marktanalyse in 01-market-brief basierte auf BINANCE:BTCUSDT/aggregiertem CRYPTO:BTCUSD-Feed. Siehe Verkettungs-Auswertung fuer die daraus resultierende Symbol-Identitaets-Luecke.",
+      "timeframe": "1D",
+      "direction": "long",
+      "entry_condition": "Tagesschluss (close) > EMA(20) UND RSI(14) zwischen 45 und 65 (Trendbestaetigung ohne Ueberhitzung)",
+      "exit_take_profit": "kein fixes Kursziel - Ausstieg regelbasiert (siehe exit_stop_loss)",
+      "exit_stop_loss": "Tagesschluss < EMA(20) ODER RSI(14) > 75 (Trendbruch oder Ueberhitzung)",
+      "time_horizon": "mittelfristig (Tage bis wenige Wochen), 1D-Chart",
+      "suggested_position_pct": 0.15,
+      "confidence": 0.5,
+      "bull_summary": "Preis ueber allen relevanten 1D-Durchschnitten (EMA10/20/50, SMA50/200), 1D-Rating Buy, RSI 51.5 mit Aufwaertsraum. Preis haelt sich trotz ETF-Outflows - deutet auf Nachfrage jenseits der ETF-Fluesse hin.",
+      "bear_summary": "$1.11 Mrd. ETF-Outflows in 2 Tagen sind ein hartes, nicht-technisches Warnsignal fuer institutionelle Nachfrage. 4h-MA-Rating bereits 'Sell' trotz 1D-Buy - kurzfristiges Momentum schwaecht sich ab, bevor sich das im Tages-Rating zeigt.",
+      "resolution_rationale": "Technische Struktur ist eindeutiger belegt (mehrere MAs, mehrere Timeframes) als die fundamentale Bear-These (ETF-Flows sind nachlaufend, nicht zwingend praediktiv fuer die naechsten Tage). Moderate statt hohe Konfidenz, da die Bear-These nicht ignoriert wird."
+    },
+    {
+      "symbol": "ETHUSDT",
+      "resolved_instrument": "BYBIT:ETHUSDT.P (fuer Backtest/Exekution)",
+      "timeframe": "1D",
+      "direction": "long",
+      "entry_condition": "Tagesschluss (close) > EMA(20) UND RSI(14) zwischen 45 und 65",
+      "exit_take_profit": "kein fixes Kursziel - Ausstieg regelbasiert",
+      "exit_stop_loss": "Tagesschluss < EMA(20) ODER RSI(14) > 75",
+      "time_horizon": "mittelfristig (Tage bis wenige Wochen), 1D-Chart",
+      "suggested_position_pct": 0.10,
+      "confidence": 0.45,
+      "bull_summary": "1D UND 4h beide 'Buy' (staerker als BTC, wo 4h neutral war), MA-Rating 1D 'Strong Buy'. Positive Kursreaktion trotz CLARITY-Act-Scheitern spricht fuer robuste zugrundeliegende Nachfrage.",
+      "bear_summary": "1W-Oszillatoren-Rating 'Sell' trotz kurzfristig durchgehend bullischem Bild - moegliche laengerfristige Erschoepfung. ETF-Outflow-Warnsignal gilt fuer ETH genauso wie fuer BTC.",
+      "resolution_rationale": "Aehnlich wie BTC, aber mit einer zusaetzlichen laengerfristigen (1W) Warnung, die es bei BTC im 1W-Rating nicht in dieser Deutlichkeit gab (BTC 1W war 'Neutral', ETH 1W-Oszillatoren explizit 'Sell'). Etwas niedrigere Konfidenz als BTC deshalb gerechtfertigt."
+    },
+    {
+      "symbol": "SOLUSDT",
+      "resolved_instrument": "BYBIT:SOLUSDT.P (fuer Backtest/Exekution)",
+      "timeframe": "1D",
+      "direction": "long",
+      "entry_condition": "Tagesschluss (close) > EMA(20) UND RSI(14) zwischen 45 und 65",
+      "exit_take_profit": "kein fixes Kursziel - Ausstieg regelbasiert",
+      "exit_stop_loss": "Tagesschluss < EMA(20) ODER RSI(14) > 75",
+      "time_horizon": "mittelfristig (Tage bis wenige Wochen), 1D-Chart",
+      "suggested_position_pct": 0.05,
+      "confidence": 0.5,
+      "bull_summary": "Konsistenteste bullische Struktur der drei Symbole (1D UND 4h beide 'Strong Buy' bei den MAs), zusaetzlich SOL-spezifische positive Oekosystem-News (peaqOS-Launch, Speed-Upgrade) ohne erkennbaren Gegenwind.",
+      "bear_summary": "Keine SOL-spezifische Bear-These aus dem Market Brief ableitbar - einzige Gegenrede ist die branchenweite Vorsicht wegen CLARITY-Act-Scheiterns, die alle drei Symbole gleichermassen betrifft.",
+      "resolution_rationale": "Technisch die staerkste Einzelthese der drei. ABER: Die Korrelationsmatrix im Market Brief zeigt SOL/BTC (0.829) und SOL/ETH (0.83) als 'sehr stark positiv' - SOL ist trotz eigener positiver News keine unabhaengige Wette, sondern Teil desselben Krypto-Beta-Clusters wie BTC und ETH. Die Positionsgroesse wird deshalb bewusst am kleinsten von den dreien angesetzt (0.05 statt z.B. 0.15), NICHT weil die Einzelthese schwaecher waere, sondern um das Gesamtportfolio nicht auf eine einzige, dreifach gehebelte Wette auf 'Krypto steigt' zu konzentrieren. Das ist eine direkte Anwendung von Regel 4 (Diversifikation) aus diesem Agenten-Prompt."
+    }
+  ],
+  "no_thesis_symbols": [],
+  "diversification_note": "Alle drei Hypothesen sind technisch bullisch mit fast identischer Einstiegs-/Ausstiegsregel. Die Korrelation von 0.82-0.88 zwischen allen drei Paaren bedeutet: Wird in alle drei gleichzeitig investiert, ist das wirtschaftlich NAHE an einer einzigen, ueberproportional grossen Wette auf 'Krypto-Risikoappetit steigt', nicht an drei unabhaengigen Ideen. Positionsgroessen wurden entsprechend gestaffelt (BTC 0.15 > ETH 0.10 > SOL 0.05) statt gleich gewichtet - das finale Wort zur Gesamt-Kapitalallokation liegt bei Agent 5 (Portfolio-Manager), diese Gewichtung ist ein Vorschlag."
+}
