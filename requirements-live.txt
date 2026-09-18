@@ -1,0 +1,4 @@
+# Additional dependency for orchestrator.agent_runner.ClaudeAgentRunner
+# (live mode for Agents 2, 4, 5, 7 — see its docstring). Not needed for
+# --mode replay or for the core orchestrator test suite.
+anthropic>=0.40
