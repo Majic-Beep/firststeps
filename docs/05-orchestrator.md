@@ -37,10 +37,24 @@ austauschbare Schnittstelle (`AgentRunner`) mit zwei Implementierungen:
   (`orchestrator/fixtures/2026-09-17-eth-cycle/`, aus `tests/chain-agent1-2-3-4-5-6/` in die
   kanonischen Schemas überführt). Das ist der einzige Modus, der tatsächlich getestet und lauffähig
   ist — siehe `orchestrator/tests/`.
-- **`ClaudeAgentRunner`** — ein dokumentierter, aber **nicht implementierter** Erweiterungspunkt
-  für einen echten, live laufenden Agenten-Aufruf. Seine Docstring listet genau, was fehlt (API-Key,
-  echte Tool-Anbindung pro Datenquelle, die menschliche Bestätigung bei Co-Invest). Das ist bewusst
-  kein halbfertiger Vortäusch-Code, der beim ersten echten Aufruf überraschend fehlschlägt.
+- **`ClaudeAgentRunner`** — **echt implementiert, aber unverifiziert** für die vier reinen
+  Reasoning-Agenten (2 Stratege, 4 Risikomanager, 5 Portfolio-Manager, 7 Lern-Agent). Diese
+  brauchen laut eigenem Prompt keinen zwingenden Tool-Zugriff — der Orchestrator liefert ihnen
+  bereits alle nötigen Daten als Input. Für Agent 2 werden dabei bewusst drei getrennte Aufrufe
+  gemacht (Bull-, Bear-Researcher, Moderator), wie in `agents/02-strategy-researcher.md`
+  empfohlen. Für Agent 1 (Marktanalyst), 3 (Validator) und 6 (Execution-Trader) wirft
+  `run()` bewusst `NotImplementedError` — diese brauchen echten Markt-/Backtest-/
+  Ausführungs-Tool-Zugriff, den ein eigenständiges Skript ohne eigene REST-Clients für
+  TradingView/tradingkit/Co-Invest nicht hat.
+
+  **Wichtig:** In dieser Umgebung stand kein `ANTHROPIC_API_KEY` zur Verfügung, daher wurde der
+  eigentliche API-Aufruf-Pfad **nie erfolgreich gegen die echte Anthropic-API getestet**.
+  Getestet (ohne Key, siehe `orchestrator/tests/test_claude_agent_runner.py`) sind die Teile,
+  die das nicht brauchen: Prompt-Extraktion aus den echten `agents/*.md`-Dateien, und dass die
+  nicht unterstützten Stufen sowie ein fehlender Key die richtigen Fehler auslösen. Der Test für
+  den echten API-Aufruf ist explizit übersprungen (`@unittest.skipUnless`), solange kein Key
+  gesetzt ist — ein grüner Testlauf soll hier nicht vortäuschen, mehr geprüft zu haben, als
+  tatsächlich geprüft wurde.
 
 ## Warum der mitgelieferte Zyklus trotzdem nie Agent 7 automatisch erreicht
 
@@ -59,10 +73,24 @@ funktioniert, sobald diese Bedingung erfüllt ist.
 ## Ausführen
 
 ```bash
-pip install -r requirements.txt      # nur PyYAML
-python -m unittest discover -s orchestrator/tests -v   # alle Tests laufen ohne API-Key
+pip install -r requirements.txt      # nur PyYAML, fuer --mode replay
+python -m unittest discover -s orchestrator/tests -v   # 28 Tests laufen ohne API-Key, 1 wird uebersprungen
 python -m orchestrator.cli --mode replay
 ```
+
+Um den `ClaudeAgentRunner`-Pfad tatsächlich zu verifizieren (bisher ungetestet, siehe oben):
+
+```bash
+pip install -r requirements-live.txt   # zusaetzlich: anthropic
+export ANTHROPIC_API_KEY=sk-ant-...
+python -m unittest orchestrator.tests.test_claude_agent_runner -v   # jetzt 5/5 statt 4/5+1 uebersprungen
+```
+
+`--mode live` in der CLI instanziiert `ClaudeAgentRunner`, aber ein **vollständiger** Pipeline-Lauf
+damit schlägt aktuell zwangsläufig gleich bei Agent 1 fehl (`NotImplementedError`) — die
+Live-Anbindung deckt bisher nur einzelne Reasoning-Stufen ab, keinen kompletten Zyklus. Um eine
+der vier unterstützten Stufen isoliert zu testen, `ClaudeAgentRunner().run(stage, input_data)`
+direkt aufrufen statt über `run_pipeline()`.
 
 Der Lauf schreibt einen vollständigen Audit-Trail nach `runs/<Zeitstempel>/` (durch `.gitignore`
 ausgeschlossen — das sind Laufzeit-Artefakte, kein Quellcode).
@@ -70,8 +98,13 @@ ausgeschlossen — das sind Laufzeit-Artefakte, kein Quellcode).
 ## Grenzen dieser ersten Version
 
 - Nur ein einziger, real aufgezeichneter Zyklus ist als Fixture hinterlegt. Für weitere Zyklen
-  müssten neue Fixtures nach demselben Muster erstellt werden (oder `ClaudeAgentRunner`
-  fertig implementiert werden).
+  müssten neue Fixtures nach demselben Muster erstellt werden — oder `ClaudeAgentRunner`
+  (siehe oben: implementiert für Agent 2/4/5/7, aber unverifiziert) mit einem echten API-Key
+  getestet und für Agent 1/3/6 um echte Tool-Anbindung ergänzt werden.
+- `--mode live` kann aktuell keinen vollständigen 7-Agenten-Zyklus durchlaufen — nur einzelne,
+  isolierte Aufrufe der vier unterstützten Reasoning-Stufen. Ein Live-Zyklus mit echten
+  Marktdaten erfordert weiterhin den manuellen Weg (wie in `tests/chain-agent1-2-3-4-5-6-7/`
+  vorgeführt), bis jemand REST-Clients für TradingView/tradingkit/Co-Invest ergänzt.
 - Die Kill-Switches decken die vier bisher konkret gefundenen/geforderten Fälle ab
   (Tagesverlust, globales Veto, Positionsgrößen-Obergrenze, fehlendes TP/SL). Weitere Limits aus
   `config/mandate.example.yaml` (Cluster-Limit, Hebel) sind im Mandat definiert, aber noch nicht
