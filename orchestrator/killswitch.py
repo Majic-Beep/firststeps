@@ -59,7 +59,7 @@ def check_position_size_ceiling(approved_orders: dict, risk_verdict: dict) -> No
 
 
 def check_tp_sl_proposed(execution_report: dict) -> None:
-    """Every position-opening execution must have proposed TP/SL.
+    """Every position-opening execution must have a proposed protective order.
 
     Added directly as a result of Agent 7's first real post-mortem
     (tests/phase1-agent7/): the 2026-09-17 ETH cycle was prepared and
@@ -67,15 +67,32 @@ def check_tp_sl_proposed(execution_report: dict) -> None:
     agents/06-execution-trader.md, Regel 3. That was a clear-cut rule
     violation, not ambiguous outcome variance, so it is enforced here in
     code rather than left to an agent remembering the rule next time.
+
+    What "tp_sl_proposed: true" requires is platform-dependent, and
+    agents/06-execution-trader.md is the source of truth per platform:
+    - Co-Invest (human-confirmed): both take-profit AND stop-loss must be
+      proposed, as originally required.
+    - Alpaca (autonomous execution, added 2026-09-21): stop-loss ALONE
+      satisfies this flag. A real test on 2026-09-20/21 showed Alpaca
+      rejects both `bracket` and `oco` order classes for crypto, and two
+      independent resting sell orders (a TP limit and an SL stop_limit)
+      cannot coexist — each tries to reserve the full position, so the
+      second is rejected with "insufficient balance". Risk protection
+      (stop-loss) was deliberately prioritized over profit-taking
+      (take-profit) for this platform — see agents/06 for the full
+      rationale. This function does not need to know which platform
+      produced the report; it only checks the flag Agent 6 already
+      set correctly per its own platform-specific rules.
     """
     opens = {"prepared_awaiting_human_confirmation", "executed"}
     for execution in execution_report.get("executions", []):
         if execution["status"] in opens and not execution.get("tp_sl_proposed"):
             raise KillSwitchTriggered(
                 f"{execution['symbol']}: Position wird eröffnet/vorbereitet ohne "
-                f"vorgeschlagenes Take-Profit/Stop-Loss. Das verletzt "
-                f"agents/06-execution-trader.md, Regel 3 — Pipeline gestoppt, "
-                f"bevor ein Mensch überhaupt zur Bestätigung aufgefordert wird."
+                f"vorgeschlagenes Take-Profit/Stop-Loss (bzw. mindestens Stop-Loss "
+                f"auf Plattformen, die kein gleichzeitiges TP+SL erlauben, siehe "
+                f"agents/06-execution-trader.md). Das verletzt Regel 3 — Pipeline "
+                f"gestoppt, bevor die Order als abgeschlossen gilt."
             )
 
 
