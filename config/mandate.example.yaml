@@ -3,17 +3,51 @@
 # Dies ist eine VORLAGE, keine Live-Konfiguration. Agent 4 (Risikomanager) und der
 # Orchestrator lesen diese Werte als Eingabeparameter - sie werden von keinem Agenten
 # selbst veraendert (siehe agents/04-risk-manager.md, Hinweise zur Implementierung).
-# Referenziert aus: agents/04-risk-manager.md, docs/02-architektur.md.
+# Referenziert aus: agents/04-risk-manager.md, agents/06-execution-trader.md,
+# docs/02-architektur.md.
 
 capital:
   base_currency: USD
-  initial_capital: 10000
+  # Historischer Startwert des Alpaca-Paper-Kontos (angelegt 2026-09-20), NICHT die
+  # aktuelle Kapitalbasis fuer Positionsgroessen-Berechnungen. Agent 4/5/6 MUESSEN die
+  # tatsaechliche, aktuelle Equity live abfragen (GET /v2/account, Feld "equity")
+  # statt diesen Wert zu verwenden - das Konto veraendert sich taeglich durch PnL.
+  # Grund fuer diese Aenderung (2026-09-21): der erste echte Alpaca-Testlauf wurde
+  # manuell gegen die reale Equity (~$100.000) gerechnet, waehrend dieser Wert hier
+  # noch $10.000 zeigte - eine automatisierte Auswertung haette bei woertlicher Nutzung
+  # dieser Datei Positionsgroessen um den Faktor 10 falsch berechnet.
+  initial_capital: 100000
+  capital_source: live
   # currently_available_pct wird laufend vom Orchestrator aktualisiert, nicht hier gepflegt.
 
+# Marktanalyse (Agent 1) und Ausfuehrung (Agent 6) laufen auf unterschiedlichen
+# Plattformen mit unterschiedlicher Symbol-Notation - siehe execution_platform unten.
 universe:
   - BYBIT:BTCUSDT.P
   - BYBIT:ETHUSDT.P
   - BYBIT:SOLUSDT.P
+
+# Seit 2026-09-21: Alpaca ist die Ausfuehrungsplattform fuer neue, vom Mandat
+# genehmigte Orders (siehe agents/06-execution-trader.md, Plattform B). Co-Invest
+# bleibt nur fuer die vorher bestehenden Positionen (ETH-PERP, TSLA-PERP) relevant,
+# dort werden keine neuen Mandats-Orders mehr platziert.
+execution_platform:
+  name: alpaca
+  api_base: https://paper-api.alpaca.markets
+  # Bybit-Perp-Symbol (Marktanalyse-Universum oben) -> Alpaca-Spot-Symbol (Ausfuehrung).
+  # Kein Perp/Future auf Alpaca vorhanden - jedes gemappte Symbol ist Spot.
+  symbol_map:
+    BYBIT:BTCUSDT.P: BTC/USD
+    BYBIT:ETHUSDT.P: ETH/USD
+    BYBIT:SOLUSDT.P: SOL/USD
+  # Real geprueft am 2026-09-20 (GET /v2/assets/BTC%2FUSD etc.) fuer alle drei
+  # gemappten Symbole: marginable=false, shortable=false.
+  supports_leverage: false
+  supports_short: false
+  # Alpaca lehnt bei Krypto sowohl order_class=bracket als auch order_class=oco ab;
+  # zwei unabhaengige TP/SL-Sell-Orders koennen nicht gleichzeitig bestehen (jede
+  # reserviert die volle Positionsgroesse). Siehe agents/06-execution-trader.md.
+  supports_simultaneous_tp_sl: false
 
 risk_limits:
   # Harte Limits (Agent 4, Regel 3): Ueberschreitung = VETO, keine Interpretation.
@@ -21,6 +55,10 @@ risk_limits:
   max_position_pct_per_cluster: 0.30
   correlation_cluster_threshold: 0.70   # ab dieser 30-Tage-Korrelation gelten zwei Symbole als ein Cluster
   max_daily_loss_pct: 0.05              # globales Veto fuer ALLE neuen Positionen bei Ueberschreitung
+  # Gilt fuer Plattformen/Instrumente mit Hebel (z. B. Co-Invest-Perps). Fuer die
+  # aktuelle Ausfuehrungsplattform Alpaca-Krypto-Spot ohnehin irrelevant, da dort
+  # kein Hebel moeglich ist (execution_platform.supports_leverage: false) - dieses
+  # Limit sollte nicht als "Hebel wird auf Alpaca genutzt" missverstanden werden.
   max_leverage: 2.0
 
 validation_limits:
