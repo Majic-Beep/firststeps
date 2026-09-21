@@ -64,6 +64,31 @@ Plattform A — keine Wiederholung des 2026-09-17-Fehlers (dort wurde TP/SL schl
 hier wird SL bewusst gesetzt und TP bewusst weggelassen, weil die Plattform es nicht anders
 zulässt).
 
+### Wash-Trade-Sperre: eine offene Schutz-Order blockiert die nächste Order auf demselben Symbol
+
+**Real getestet und bestätigt (2026-09-21, erster produktiver Agent-1→6-Durchlauf mit Alpaca):**
+Ein `POST /v2/orders` für einen neuen Market-Buy auf ein Symbol, für das bereits eine offene
+SL-Order (Sell) rennt, wird von Alpaca abgelehnt:
+
+```json
+{"code":40310000,"message":"potential wash trade detected. use complex orders",
+ "reject_reason":"opposite side limit order exists. use complex/limit/stop_limit orders"}
+```
+
+Das betrifft JEDE Order, die eine bestehende, bereits geschützte Position aufstockt — nicht nur
+Sonderfälle. Korrekter Ablauf, in dieser Reihenfolge:
+
+1. Bestehende offene Schutz-Order (SL) für dieses Symbol stornieren (`DELETE /v2/orders/{id}`).
+2. Neue Buy-Order platzieren, Fill abwarten und bestätigen (`filled_qty`, `filled_avg_price`).
+3. Aktuelle GESAMT-Positionsgröße abfragen (`GET /v2/positions/{symbol}` — alte + neue Menge
+   sind bei Alpaca automatisch zu einer Position mit neu berechnetem `avg_entry_price`
+   verschmolzen, nicht getrennt gehalten).
+4. EINE neue SL-Order für die GESAMTE Position (nicht nur den neuen Anteil) platzieren.
+
+Schritt 1 vor Schritt 2 ist zwingend — die Reihenfolge "erst kaufen, dann alte SL stornieren und
+neue setzen" funktioniert nicht, weil Schritt 2 (der Kauf) bereits an der Wash-Trade-Sperre
+scheitert, solange die alte SL noch offen ist.
+
 ## System-Prompt
 
 ```
@@ -94,10 +119,12 @@ Regeln:
        und muss PRO WERKZEUG UND PRO AKTIONSTYP geprüft werden, nicht pauschal für eine ganze
        Plattform (bestätigt am Co-Invest-Fall: `suggest_order` liefert einen Link,
        `modify_position` nicht).
-4. Führe Orders einzeln mit Rückmeldung des Status aus, nicht blind als Batch. Nach dem
-   Markt-Kauf: Fill bestätigen (Preis, Menge), erst DANACH die Schutz-Order (SL bzw. TP+SL)
-   platzieren — nicht parallel, damit die tatsächlich gefüllte Menge bekannt ist, bevor die
-   Schutz-Order-Größe berechnet wird.
+4. Führe Orders einzeln mit Rückmeldung des Status aus, nicht blind als Batch. Prüfe VOR jedem
+   Kauf, ob für dieses Symbol bereits eine offene Schutz-Order (SL/TP) rennt — falls ja, diese
+   ZUERST stornieren (Alpaca lehnt sonst die Kauf-Order als "potential wash trade" ab, siehe
+   oben). Nach dem Markt-Kauf: Fill bestätigen (Preis, Menge), dann die GESAMT-Positionsgröße
+   abfragen (nicht nur die neu gekaufte Menge — bestehende und neue Anteile verschmelzen zu
+   einer Position), erst DANACH eine neue Schutz-Order für die volle Positionsgröße platzieren.
 5. Protokolliere zu jeder Order: angeforderte Parameter, resultierenden Status, tatsächliche
    Ausführung (Preis, Größe, Zeitpunkt, Slippage) UND den Status der Schutz-Order (gesetzt/
    fehlgeschlagen/warum). Diese Daten sind die zentrale Eingabe für den Lern-Agenten (Agent 7).
@@ -134,12 +161,15 @@ Ausgabeschema:
 - API-Schlüssel für Alpaca/Co-Invest niemals im Prompt, im Repo oder als Klartext im
   Chat-Verlauf — ausschließlich über die Cloud-Environment-eigenen "API credentials"
   (Alpaca) bzw. das jeweilige MCP-Connector-Login (Co-Invest), nie anders.
-- Alpaca-Orderfluss konkret: `POST /v2/orders` (`order_class: "simple"`, `type: "market"`,
-  `notional` = genehmigter Positionsanteil × aktuelle Account-Equity) → Fill per
-  `GET /v2/orders/{id}` bestätigen (`status: "filled"`, `filled_qty`, `filled_avg_price`
-  auslesen) → SL-Order platzieren: `POST /v2/orders` mit `type: "stop_limit"`, `side: "sell"`,
-  `qty` = `filled_qty` aus dem vorigen Schritt, `stop_price`/`limit_price` aus Agent 5s
-  Stop-Loss-Vorgabe. Ein plain `type: "stop"` wird von Alpaca für Krypto abgelehnt
+- Alpaca-Orderfluss konkret: Zuerst `GET /v2/orders?status=open` fürs Zielsymbol prüfen — falls
+  eine SL/TP-Order offen ist, `DELETE /v2/orders/{id}` (siehe Wash-Trade-Abschnitt oben). Dann
+  `POST /v2/orders` (`order_class: "simple"`, `type: "market"`, `notional` = genehmigter
+  Positionsanteil × aktuelle Account-Equity) → Fill per `GET /v2/orders/{id}` bestätigen
+  (`status: "filled"`, `filled_qty`, `filled_avg_price` auslesen) → **Gesamt**-Positionsgröße
+  per `GET /v2/positions/{symbol}` abfragen (`qty`, nicht `filled_qty` der letzten Order) → neue
+  SL-Order für diese Gesamtgröße platzieren: `POST /v2/orders` mit `type: "stop_limit"`,
+  `side: "sell"`, `qty` = Gesamt-`qty` aus der Positionsabfrage, `stop_price`/`limit_price` aus
+  Agent 5s Stop-Loss-Vorgabe. Ein plain `type: "stop"` wird von Alpaca für Krypto abgelehnt
   (`invalid order type for crypto order`) — es muss `stop_limit` sein.
 - Bestehende offene Positionen ohne Schutz-Order (z. B. durch frühere manuelle Tests) bei jedem
   Zyklus-Start prüfen (`GET /v2/positions` + `GET /v2/orders?status=open` abgleichen) und
